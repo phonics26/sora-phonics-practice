@@ -1,4 +1,4 @@
 import './style.css'
-import { renderHomePage } from './pages/HomePage.js'
+import { navigate } from './router.js'
 
-renderHomePage()
+navigate('home')
