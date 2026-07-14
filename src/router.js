@@ -7,13 +7,13 @@ const pages = {
 }
 
 export function navigate(pageName) {
-  const renderPage = pages[pageName]
+  const page = pages[pageName]
 
-  if (typeof renderPage !== 'function') {
-    console.error(`Cannot open page: ${pageName}`)
+  if (typeof page !== 'function') {
+    console.error(`Page not found: ${pageName}`)
     return
   }
 
   window.scrollTo(0, 0)
-  renderPage()
+  page()
 }
