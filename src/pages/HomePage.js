@@ -1,7 +1,21 @@
 import '../styles/homePage.css'
+import { navigate } from '../router.js'
 
 export function renderHomePage() {
   const app = document.querySelector('#app')
+
+  const activity1Score = Number(
+    sessionStorage.getItem('activity1Score') || 0
+  )
+
+  const activity1Complete =
+    sessionStorage.getItem('activity1Complete') === 'true'
+
+  const totalStars = activity1Score
+  const progressPercentage = Math.min(
+    (totalStars / 30) * 100,
+    100
+  )
 
   app.innerHTML = `
     <main class="home-page">
@@ -27,13 +41,15 @@ export function renderHomePage() {
 
           <img
             class="home-mascot"
-            src="/mascot/cloud_smile_clean.png"
+            src="/sora-phonics-practice/mascot/cloud_smile_clean.png"
             alt="SORA cloud mascot"
           />
 
           <div class="home-speech">
             <strong>Welcome!</strong>
-            <p>Complete three games to unlock your SORA English reward!</p>
+            <p>
+              Complete three games to unlock your SORA English reward!
+            </p>
           </div>
         </section>
 
@@ -41,7 +57,9 @@ export function renderHomePage() {
           <div class="progress-heading">
             <div>
               <p>Your progress</p>
-              <strong id="star-total">0 / 30 Stars</strong>
+              <strong id="star-total">
+                ${totalStars} / 30 Stars
+              </strong>
             </div>
 
             <span class="progress-star">⭐</span>
@@ -51,7 +69,7 @@ export function renderHomePage() {
             <div
               id="home-progress-bar"
               class="home-progress-bar"
-              style="width: 0%"
+              style="width: ${progressPercentage}%"
             ></div>
           </div>
         </section>
@@ -63,12 +81,16 @@ export function renderHomePage() {
               <h2>Choose a game</h2>
             </div>
 
-            <span>1 of 3 unlocked</span>
+            <span>
+              ${activity1Complete ? '2' : '1'} of 3 unlocked
+            </span>
           </div>
 
           <div class="activity-list">
             <article class="activity-card activity-unlocked">
-              <div class="activity-number">1</div>
+              <div class="activity-number">
+                ${activity1Complete ? '✓' : '1'}
+              </div>
 
               <div class="activity-icon letter-icon">
                 ABC
@@ -77,7 +99,13 @@ export function renderHomePage() {
               <div class="activity-information">
                 <p>ACTIVITY 1</p>
                 <h3>Letter Smash</h3>
-                <span>Listen and tap the correct letter.</span>
+                <span>
+                  ${
+                    activity1Complete
+                      ? `Completed — ${activity1Score} stars earned.`
+                      : 'Listen and tap the correct letter.'
+                  }
+                </span>
               </div>
 
               <button
@@ -85,11 +113,17 @@ export function renderHomePage() {
                 class="play-button"
                 type="button"
               >
-                Play
+                ${activity1Complete ? 'Play Again' : 'Play'}
               </button>
             </article>
 
-            <article class="activity-card activity-locked">
+            <article
+              class="activity-card ${
+                activity1Complete
+                  ? 'activity-unlocked'
+                  : 'activity-locked'
+              }"
+            >
               <div class="activity-number">2</div>
 
               <div class="activity-icon goal-icon">
@@ -99,12 +133,32 @@ export function renderHomePage() {
               <div class="activity-information">
                 <p>ACTIVITY 2</p>
                 <h3>Sound Goal</h3>
-                <span>Complete Activity 1 to unlock.</span>
+                <span>
+                  ${
+                    activity1Complete
+                      ? 'Ready to play.'
+                      : 'Complete Activity 1 to unlock.'
+                  }
+                </span>
               </div>
 
-              <div class="lock-badge" aria-label="Locked">
-                🔒
-              </div>
+              ${
+                activity1Complete
+                  ? `
+                    <button
+                      id="activity-two-button"
+                      class="play-button"
+                      type="button"
+                    >
+                      Play
+                    </button>
+                  `
+                  : `
+                    <div class="lock-badge" aria-label="Locked">
+                      🔒
+                    </div>
+                  `
+              }
             </article>
 
             <article class="activity-card activity-locked">
@@ -117,7 +171,9 @@ export function renderHomePage() {
               <div class="activity-information">
                 <p>ACTIVITY 3</p>
                 <h3>Memory Match</h3>
-                <span>Complete Activity 2 to unlock.</span>
+                <span>
+                  Complete Activity 2 to unlock.
+                </span>
               </div>
 
               <div class="lock-badge" aria-label="Locked">
@@ -140,12 +196,16 @@ export function renderHomePage() {
           </div>
 
           <div class="reward-stars">
-            <strong>0</strong>
+            <strong>${totalStars}</strong>
             <span>/ 30 ⭐</span>
           </div>
         </section>
 
-        <p id="home-message" class="home-message" aria-live="polite"></p>
+        <p
+          id="home-message"
+          class="home-message"
+          aria-live="polite"
+        ></p>
       </section>
     </main>
   `
@@ -154,10 +214,28 @@ export function renderHomePage() {
     '#activity-one-button'
   )
 
+  activityOneButton.addEventListener('click', () => {
+    navigate('activity1')
+  })
+
+  const activityTwoButton = document.querySelector(
+    '#activity-two-button'
+  )
+
+  if (activityTwoButton) {
+    activityTwoButton.addEventListener('click', () => {
+      navigate('activity2')
+    })
+  }
+
+  const menuButton = document.querySelector(
+    '#home-menu-button'
+  )
+
   const message = document.querySelector('#home-message')
 
-  activityOneButton.addEventListener('click', () => {
+  menuButton.addEventListener('click', () => {
     message.textContent =
-      'Activity 1 selected. Letter Smash will open next.'
+      'The menu will be added later.'
   })
 }
