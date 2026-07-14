@@ -228,4 +228,4 @@
         </button>
       </section>
     </main>
-  `,document.querySelector("#activity-home-button").addEventListener("click",()=>{n("home")})}const u={home:d,activity1:p};function n(s){const i=u[s];if(typeof i!="function"){console.error(`Cannot open page: ${s}`);return}window.scrollTo(0,0),i()}n("home");
+  `,document.querySelector("#activity-home-button").addEventListener("click",()=>{n("home")})}const u={home:d,activity1:p};function n(s){const i=u[s];if(typeof i!="function"){console.error(`Page not found: ${s}`);return}window.scrollTo(0,0),i()}n("home");
