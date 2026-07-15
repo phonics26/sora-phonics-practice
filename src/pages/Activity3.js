@@ -27,7 +27,7 @@ const rounds = [
   },
   {
     sentenceStart: 'The',
-    sentenceEnd: 'can hop.',
+    sentenceEnd: 'can run.',
     target: 'fox',
     choices: ['pig', 'hen', 'fox'],
     picture: '🦊',
@@ -79,6 +79,9 @@ const rounds = [
 let currentRound = 0
 let score = 0
 let acceptingAnswer = true
+let draggedButton = null
+let dragOffsetX = 0
+let dragOffsetY = 0
 
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
@@ -101,14 +104,13 @@ function renderGame() {
             id="cvc-home-button"
             class="cvc-back-button"
             type="button"
-            aria-label="Return home"
           >
             ←
           </button>
 
           <div class="cvc-title">
             <p>SORA ADVENTURE</p>
-            <h1>Sentence Builder</h1>
+            <h1>Word Builder</h1>
           </div>
 
           <div class="cvc-score-box">
@@ -134,7 +136,7 @@ function renderGame() {
 
           <div class="cvc-speech-bubble">
             <p id="cvc-coach-message">
-              Choose the missing word!
+              Drag the correct word into the blank!
             </p>
           </div>
         </section>
@@ -160,22 +162,29 @@ function renderGame() {
           <div
             id="cvc-picture"
             class="cvc-picture"
-            aria-hidden="true"
           ></div>
 
           <p class="cvc-sentence">
             <span id="cvc-sentence-start"></span>
 
-            <span class="cvc-blank">___</span>
+            <span
+              id="cvc-drop-zone"
+              class="cvc-drop-zone"
+            >
+              Drop here
+            </span>
 
             <span id="cvc-sentence-end"></span>
           </p>
         </section>
 
+        <p class="cvc-drag-instruction">
+          Touch and drag one word into the blank.
+        </p>
+
         <section
           id="cvc-choices"
           class="cvc-choices"
-          aria-label="Word choices"
         ></section>
 
         <p
@@ -183,7 +192,7 @@ function renderGame() {
           class="cvc-feedback"
           aria-live="polite"
         >
-          Choose one word.
+          Drag one word into the blank.
         </p>
       </section>
     </main>
@@ -205,6 +214,7 @@ function loadRound() {
   acceptingAnswer = true
 
   const round = rounds[currentRound]
+  const dropZone = document.querySelector('#cvc-drop-zone')
 
   document.querySelector('#cvc-round-number').textContent =
     currentRound + 1
@@ -222,16 +232,19 @@ function loadRound() {
     `${round.sentenceStart} `
 
   document.querySelector('#cvc-sentence-end').textContent =
-    round.sentenceEnd
+    ` ${round.sentenceEnd}`
 
   document.querySelector('#cvc-coach-message').textContent =
-    'Which word completes the sentence?'
+    'Drag the correct word into the blank!'
 
   document.querySelector('#cvc-feedback').textContent =
-    'Choose one word.'
+    'Drag one word into the blank.'
 
   document.querySelector('#cvc-feedback').className =
     'cvc-feedback'
+
+  dropZone.textContent = 'Drop here'
+  dropZone.className = 'cvc-drop-zone'
 
   const choicesContainer =
     document.querySelector('#cvc-choices')
@@ -252,50 +265,137 @@ function loadRound() {
 
   document
     .querySelectorAll('.cvc-choice')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        checkAnswer(button)
-      })
-    })
+    .forEach(enableWordDragging)
 
   setTimeout(speakSentence, 450)
 }
 
-function speakSentence() {
-  const round = rounds[currentRound]
-
-  if (!round) {
-    return
-  }
-
-  const fullSentence =
-    `${round.sentenceStart} ${round.target} ${round.sentenceEnd}`
-
-  if (!('speechSynthesis' in window)) {
-    document.querySelector('#cvc-feedback').textContent =
-      fullSentence
-    return
-  }
-
-  window.speechSynthesis.cancel()
-
-  const speech =
-    new SpeechSynthesisUtterance(fullSentence)
-
-  speech.rate = 0.78
-  speech.pitch = 1.03
-  speech.volume = 1
-
-  window.speechSynthesis.speak(speech)
+function enableWordDragging(button) {
+  button.addEventListener('pointerdown', startDrag)
 }
 
-function checkAnswer(button) {
+function startDrag(event) {
   if (!acceptingAnswer) {
     return
   }
 
+  event.preventDefault()
+
+  draggedButton = event.currentTarget
+
+  const rectangle = draggedButton.getBoundingClientRect()
+
+  dragOffsetX = event.clientX - rectangle.left
+  dragOffsetY = event.clientY - rectangle.top
+
+  draggedButton.setPointerCapture(event.pointerId)
+  draggedButton.classList.add('cvc-dragging')
+
+  draggedButton.style.width = `${rectangle.width}px`
+  draggedButton.style.height = `${rectangle.height}px`
+  draggedButton.style.left = `${rectangle.left}px`
+  draggedButton.style.top = `${rectangle.top}px`
+
+  moveDraggedWord(event)
+
+  draggedButton.addEventListener(
+    'pointermove',
+    moveDraggedWord
+  )
+
+  draggedButton.addEventListener(
+    'pointerup',
+    finishDrag,
+    { once: true }
+  )
+
+  draggedButton.addEventListener(
+    'pointercancel',
+    cancelDrag,
+    { once: true }
+  )
+}
+
+function moveDraggedWord(event) {
+  if (!draggedButton) {
+    return
+  }
+
+  draggedButton.style.left =
+    `${event.clientX - dragOffsetX}px`
+
+  draggedButton.style.top =
+    `${event.clientY - dragOffsetY}px`
+
+  const dropZone =
+    document.querySelector('#cvc-drop-zone')
+
+  if (isPointerInside(event, dropZone)) {
+    dropZone.classList.add('cvc-drop-zone-active')
+  } else {
+    dropZone.classList.remove('cvc-drop-zone-active')
+  }
+}
+
+function finishDrag(event) {
+  if (!draggedButton) {
+    return
+  }
+
+  const button = draggedButton
+  const dropZone =
+    document.querySelector('#cvc-drop-zone')
+
+  button.removeEventListener(
+    'pointermove',
+    moveDraggedWord
+  )
+
+  dropZone.classList.remove('cvc-drop-zone-active')
+
+  if (isPointerInside(event, dropZone)) {
+    checkDroppedWord(button)
+  } else {
+    resetDraggedWord(button)
+  }
+
+  draggedButton = null
+}
+
+function cancelDrag() {
+  if (draggedButton) {
+    resetDraggedWord(draggedButton)
+  }
+
+  draggedButton = null
+}
+
+function isPointerInside(event, element) {
+  const rectangle = element.getBoundingClientRect()
+
+  return (
+    event.clientX >= rectangle.left &&
+    event.clientX <= rectangle.right &&
+    event.clientY >= rectangle.top &&
+    event.clientY <= rectangle.bottom
+  )
+}
+
+function resetDraggedWord(button) {
+  button.classList.remove('cvc-dragging')
+
+  button.style.removeProperty('width')
+  button.style.removeProperty('height')
+  button.style.removeProperty('left')
+  button.style.removeProperty('top')
+}
+
+function checkDroppedWord(button) {
   const round = rounds[currentRound]
   const selectedWord = button.dataset.word
+
+  const dropZone =
+    document.querySelector('#cvc-drop-zone')
 
   const feedback =
     document.querySelector('#cvc-feedback')
@@ -310,8 +410,11 @@ function checkAnswer(button) {
     acceptingAnswer = false
     score += 1
 
+    resetDraggedWord(button)
     button.classList.add('cvc-correct')
-    mascot.classList.add('cvc-celebrate')
+
+    dropZone.textContent = round.target
+    dropZone.classList.add('cvc-drop-zone-correct')
 
     feedback.textContent = 'Excellent! +1 ⭐'
     feedback.className =
@@ -320,8 +423,12 @@ function checkAnswer(button) {
     coach.textContent =
       `${round.sentenceStart} ${round.target} ${round.sentenceEnd}`
 
+    mascot.classList.add('cvc-celebrate')
+
     document.querySelector('#cvc-score').textContent =
       `${score} / ${TOTAL_ROUNDS}`
+
+    speakCompletedSentence(round)
 
     setTimeout(() => {
       mascot.classList.remove('cvc-celebrate')
@@ -332,22 +439,62 @@ function checkAnswer(button) {
       } else {
         loadRound()
       }
-    }, 1000)
+    }, 1300)
   } else {
+    resetDraggedWord(button)
+
     button.classList.add('cvc-wrong')
+    dropZone.classList.add('cvc-drop-zone-wrong')
 
     feedback.textContent =
-      'Almost! Listen and try again.'
+      'Almost! Try another word.'
 
     feedback.className =
       'cvc-feedback cvc-wrong-feedback'
 
-    coach.textContent = 'You can do it!'
+    coach.textContent = 'Try again!'
 
     setTimeout(() => {
       button.classList.remove('cvc-wrong')
-    }, 500)
+      dropZone.classList.remove('cvc-drop-zone-wrong')
+    }, 550)
   }
+}
+
+function speakSentence() {
+  const round = rounds[currentRound]
+
+  if (!round) {
+    return
+  }
+
+  const sentence =
+    `${round.sentenceStart}, blank, ${round.sentenceEnd}`
+
+  speak(sentence)
+}
+
+function speakCompletedSentence(round) {
+  const sentence =
+    `${round.sentenceStart} ${round.target} ${round.sentenceEnd}`
+
+  speak(sentence)
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    return
+  }
+
+  window.speechSynthesis.cancel()
+
+  const speech = new SpeechSynthesisUtterance(text)
+
+  speech.rate = 0.78
+  speech.pitch = 1.03
+  speech.volume = 1
+
+  window.speechSynthesis.speak(speech)
 }
 
 function finishActivity() {
@@ -378,7 +525,7 @@ function finishActivity() {
 
         <p>ACTIVITY 3 COMPLETE</p>
 
-        <h1>Fantastic Sentence Building!</h1>
+        <h1>Fantastic Word Building!</h1>
 
         <div class="cvc-final-score">
           <strong>${score}</strong>
@@ -417,4 +564,135 @@ function finishActivity() {
   document
     .querySelector('#cvc-play-again')
     .addEventListener('click', renderActivity3)
+}
+
+/* ========================================
+   TOUCH DRAGGING
+======================================== */
+
+.cvc-drag-instruction {
+  margin: 12px 0 0;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.cvc-drop-zone {
+  display: inline-grid;
+  place-items: center;
+
+  min-width: clamp(100px, 28vw, 160px);
+  min-height: 52px;
+
+  margin: 0 5px;
+  padding: 4px 14px;
+
+  border: 3px dashed #8c6bdd;
+  border-radius: 14px;
+
+  color: #8069a2;
+  background: #f3edff;
+
+  font-size: clamp(0.9rem, 4vw, 1.3rem);
+
+  vertical-align: middle;
+
+  transition:
+    transform 150ms ease,
+    background 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cvc-drop-zone-active {
+  transform: scale(1.08);
+
+  border-color: #27cdb7;
+
+  color: #276e67;
+  background: #d7fff8;
+
+  box-shadow:
+    0 0 0 6px rgba(39, 205, 183, 0.18);
+}
+
+.cvc-drop-zone-correct {
+  border-style: solid;
+  border-color: #36c78b;
+
+  color: #226b4c;
+  background: #d9ffe9;
+}
+
+.cvc-drop-zone-wrong {
+  animation: cvc-drop-shake 420ms ease;
+
+  border-color: #e45b7c;
+
+  color: #a93654;
+  background: #ffe2ea;
+}
+
+@keyframes cvc-drop-shake {
+  25% {
+    transform: translateX(-8px);
+  }
+
+  50% {
+    transform: translateX(8px);
+  }
+
+  75% {
+    transform: translateX(-4px);
+  }
+}
+
+.cvc-choice {
+  position: relative;
+
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  cursor: grab;
+}
+
+.cvc-choice:active {
+  cursor: grabbing;
+}
+
+.cvc-dragging {
+  position: fixed;
+  z-index: 9999;
+
+  margin: 0;
+
+  pointer-events: none;
+
+  transform: scale(1.08) rotate(-2deg);
+
+  opacity: 0.95;
+
+  box-shadow:
+    0 22px 38px rgba(27, 15, 76, 0.38);
+
+  cursor: grabbing;
+}
+
+@media (max-width: 420px) {
+  .cvc-drop-zone {
+    min-width: 88px;
+    min-height: 46px;
+
+    padding: 3px 9px;
+  }
+
+  .cvc-drag-instruction {
+    margin-top: 8px;
+    font-size: 0.74rem;
+  }
 }
