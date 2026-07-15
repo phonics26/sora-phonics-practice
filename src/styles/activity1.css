@@ -1,37 +1,753 @@
-.smash-page {
+/* ========================================
+   ACTIVITY 1 — LETTER GOAL
+======================================== */
+
+.soccer-game-page {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #7657ec, #ef6caf);
-  font-family: Arial, sans-serif;
+
+  padding:
+    max(12px, env(safe-area-inset-top))
+    12px
+    max(12px, env(safe-area-inset-bottom));
+
+  overflow-x: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 12% 12%,
+      rgba(255, 118, 194, 0.65),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 10%,
+      rgba(70, 235, 225, 0.6),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(255, 199, 84, 0.55),
+      transparent 38%
+    ),
+    linear-gradient(
+      155deg,
+      #3c237e 0%,
+      #6044bd 48%,
+      #8157d7 100%
+    );
 }
 
-.smash-window {
-  width: min(94vw, 900px);
-  padding: 24px;
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.2);
+.soccer-game-window,
+.soccer-results-window {
+  width: min(96vw, 900px);
+  min-height: min(94vh, 780px);
+
+  padding: 18px;
+
+  overflow: hidden;
+
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  border-radius: 30px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  box-shadow:
+    0 28px 70px rgba(27, 12, 75, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+/* Header */
+
+.soccer-game-header {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 10px;
+
   color: white;
 }
 
-.smash-letter-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-top: 20px;
+.soccer-game-header p {
+  margin: 0 0 3px;
+
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+
+  opacity: 0.8;
 }
 
-.smash-letter-button {
-  min-height: 120px;
-  border: 0;
-  border-radius: 20px;
-  font-size: 3rem;
+.soccer-game-header h1 {
+  margin: 0;
+
+  color: white;
+
+  font-size: clamp(1.1rem, 5vw, 1.7rem);
+}
+
+.soccer-back-button {
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 15px;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.14);
+
+  font-size: 1.35rem;
   font-weight: 900;
+
   cursor: pointer;
 }
 
+.soccer-score-box {
+  min-width: 82px;
+
+  padding: 8px 12px;
+
+  border-radius: 15px;
+
+  text-align: center;
+
+  color: #473165;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.soccer-score-box span {
+  display: block;
+
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.soccer-score-box strong {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 0.95rem;
+}
+
+/* Progress */
+
+.soccer-progress-track {
+  width: 100%;
+  height: 12px;
+
+  margin: 16px 0;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.soccer-progress-bar {
+  width: 0;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #65efdc,
+      #ffe46c,
+      #ff8dbf
+    );
+
+  transition: width 350ms ease;
+}
+
+/* Mascot coach */
+
+.soccer-coach {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 10px;
+
+  width: min(100%, 560px);
+
+  margin: 0 auto;
+}
+
+.soccer-mascot {
+  width: 96px;
+  height: 82px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(0 10px 14px rgba(26, 11, 71, 0.28));
+
+  animation:
+    mascot-float 2.8s ease-in-out infinite;
+}
+
+@keyframes mascot-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+.soccer-speech-bubble {
+  position: relative;
+
+  padding: 14px 16px;
+
+  border-radius: 19px;
+
+  color: #503873;
+  background: rgba(255, 255, 255, 0.92);
+
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.soccer-speech-bubble::before {
+  content: '';
+
+  position: absolute;
+  left: -10px;
+  top: 27px;
+
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 11px solid rgba(255, 255, 255, 0.92);
+}
+
+.soccer-speech-bubble p {
+  margin: 0;
+}
+
+/* Instructions */
+
+.soccer-instruction {
+  margin: 16px auto 10px;
+
+  text-align: center;
+  color: white;
+}
+
+.soccer-instruction p {
+  margin: 0 0 5px;
+
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  opacity: 0.82;
+}
+
+.soccer-instruction h2 {
+  margin: 5px 0 12px;
+
+  font-size: clamp(1.45rem, 7vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.soccer-listen-button {
+  min-height: 46px;
+
+  padding: 0 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 16px;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+/* Stadium field */
+
+.soccer-goals {
+  position: relative;
+
+  width: min(100%, 760px);
+  min-height: 245px;
+
+  margin: 18px auto 0;
+  padding: 28px 12px 48px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  gap: 10px;
+
+  border: 3px solid rgba(255, 255, 255, 0.32);
+  border-radius: 28px;
+
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.05) 0,
+      rgba(255, 255, 255, 0.05) 50px,
+      rgba(255, 255, 255, 0.1) 50px,
+      rgba(255, 255, 255, 0.1) 100px
+    ),
+    linear-gradient(
+      180deg,
+      #36c77a 0%,
+      #209f5c 100%
+    );
+
+  box-shadow:
+    inset 0 14px 28px rgba(255, 255, 255, 0.13),
+    0 18px 30px rgba(24, 11, 68, 0.25);
+}
+
+.soccer-goals::before {
+  content: '';
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  width: 75px;
+  height: 75px;
+
+  transform: translate(-50%, -50%);
+
+  border: 3px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+}
+
+.soccer-goal {
+  position: relative;
+  z-index: 2;
+
+  min-width: 0;
+  min-height: 130px;
+
+  padding: 8px 5px 12px;
+
+  border: 0;
+  border-radius: 22px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.25),
+      rgba(255, 255, 255, 0.08)
+    );
+
+  box-shadow:
+    0 13px 25px rgba(14, 72, 43, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.soccer-goal:nth-child(1) {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(64, 167, 255, 0.78),
+      rgba(76, 87, 223, 0.75)
+    );
+}
+
+.soccer-goal:nth-child(2) {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 202, 68, 0.82),
+      rgba(255, 130, 59, 0.78)
+    );
+}
+
+.soccer-goal:nth-child(3) {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 105, 180, 0.8),
+      rgba(166, 77, 225, 0.78)
+    );
+}
+
+.soccer-goal:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.soccer-goal-net {
+  display: block;
+
+  font-size: clamp(3rem, 13vw, 5rem);
+  line-height: 1;
+}
+
+.soccer-goal strong {
+  position: absolute;
+  left: 50%;
+  bottom: 17px;
+
+  transform: translateX(-50%);
+
+  display: grid;
+  place-items: center;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 16px;
+
+  color: #412c59;
+  background: white;
+
+  font-size: clamp(1.8rem, 8vw, 3rem);
+  font-weight: 1000;
+
+  box-shadow:
+    0 8px 15px rgba(33, 21, 77, 0.22);
+}
+
+/* Ball */
+
+.soccer-ball-area {
+  position: relative;
+
+  width: min(100%, 760px);
+  height: 90px;
+
+  margin: -46px auto 0;
+
+  pointer-events: none;
+}
+
+.soccer-ball {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+
+  transform: translateX(-50%);
+
+  font-size: clamp(3rem, 14vw, 5rem);
+
+  filter:
+    drop-shadow(0 12px 8px rgba(20, 13, 45, 0.35));
+
+  transition:
+    transform 750ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 750ms ease;
+}
+
+/* Ball movement */
+
+.ball-to-left {
+  animation: kick-left 850ms ease forwards;
+}
+
+.ball-to-centre {
+  animation: kick-centre 850ms ease forwards;
+}
+
+.ball-to-right {
+  animation: kick-right 850ms ease forwards;
+}
+
+@keyframes kick-left {
+  to {
+    transform:
+      translate(-230%, -185px)
+      rotate(-540deg)
+      scale(0.5);
+
+    opacity: 0.2;
+  }
+}
+
+@keyframes kick-centre {
+  to {
+    transform:
+      translate(-50%, -190px)
+      rotate(540deg)
+      scale(0.5);
+
+    opacity: 0.2;
+  }
+}
+
+@keyframes kick-right {
+  to {
+    transform:
+      translate(130%, -185px)
+      rotate(540deg)
+      scale(0.5);
+
+    opacity: 0.2;
+  }
+}
+
+/* Answer feedback */
+
+.soccer-correct-goal {
+  animation: goal-flash 700ms ease;
+}
+
+@keyframes goal-flash {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+
+  45% {
+    transform: scale(1.08);
+    filter: brightness(1.7);
+  }
+}
+
+.soccer-wrong-goal {
+  animation: goal-shake 420ms ease;
+}
+
+@keyframes goal-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-9px);
+  }
+
+  50% {
+    transform: translateX(9px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+.soccer-feedback {
+  min-height: 28px;
+
+  margin: 14px 0 0;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-weight: 900;
+}
+
+.soccer-correct-feedback {
+  color: #fff278;
+}
+
+.soccer-wrong-feedback {
+  color: #ffd0df;
+}
+
+/* Results */
+
+.soccer-results-window {
+  width: min(94vw, 520px);
+  min-height: auto;
+
+  padding: 30px 24px;
+
+  text-align: center;
+  color: white;
+}
+
+.soccer-results-stars {
+  font-size: 2rem;
+  letter-spacing: 6px;
+}
+
+.soccer-results-mascot {
+  display: block;
+
+  width: min(60vw, 220px);
+  max-height: 170px;
+
+  margin: 10px auto;
+
+  object-fit: contain;
+
+  animation:
+    mascot-float 2.8s ease-in-out infinite;
+}
+
+.soccer-results-window > p:first-of-type {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.soccer-results-window h1 {
+  color: white;
+}
+
+.soccer-final-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 16px 0;
+}
+
+.soccer-final-score strong {
+  font-size: 4.5rem;
+  line-height: 1;
+}
+
+.soccer-final-score span {
+  font-weight: 800;
+}
+
+.soccer-results-window button {
+  width: 100%;
+  min-height: 55px;
+
+  margin-top: 13px;
+
+  border-radius: 18px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+#soccer-return-home {
+  border: 0;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7657ec,
+      #f065af,
+      #ff9e52
+    );
+}
+
+#soccer-play-again {
+  border: 2px solid white;
+
+  color: white;
+  background: transparent;
+}
+
+/* Tablet and desktop */
+
 @media (min-width: 700px) {
-  .smash-letter-grid {
-    grid-template-columns: repeat(5, 1fr);
+  .soccer-game-window {
+    padding: 26px 32px;
+  }
+
+  .soccer-goals {
+    min-height: 300px;
+    padding: 38px 22px 58px;
+    gap: 22px;
+  }
+
+  .soccer-goal {
+    min-height: 180px;
+  }
+
+  .soccer-goal strong {
+    width: 66px;
+    height: 66px;
+  }
+
+  @keyframes kick-left {
+    to {
+      transform:
+        translate(-390%, -225px)
+        rotate(-540deg)
+        scale(0.45);
+
+      opacity: 0.2;
+    }
+  }
+
+  @keyframes kick-centre {
+    to {
+      transform:
+        translate(-50%, -230px)
+        rotate(540deg)
+        scale(0.45);
+
+      opacity: 0.2;
+    }
+  }
+
+  @keyframes kick-right {
+    to {
+      transform:
+        translate(290%, -225px)
+        rotate(540deg)
+        scale(0.45);
+
+      opacity: 0.2;
+    }
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 420px) {
+  .soccer-game-window {
+    padding: 14px;
+    border-radius: 24px;
+  }
+
+  .soccer-coach {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .soccer-mascot {
+    width: 74px;
+    height: 65px;
+  }
+
+  .soccer-goals {
+    min-height: 215px;
+    gap: 7px;
+  }
+
+  .soccer-goal {
+    min-height: 115px;
+  }
+
+  .soccer-goal strong {
+    width: 45px;
+    height: 45px;
+    bottom: 12px;
+  }
+
+  .soccer-ball-area {
+    height: 72px;
   }
 }

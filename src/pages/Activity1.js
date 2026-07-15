@@ -1,77 +1,97 @@
 import '../styles/activity1.css'
 import { navigate } from '../router.js'
 
-const letters = ['A', 'B', 'C', 'D', 'E']
-const totalRounds = 10
+const TOTAL_KICKS = 10
 
-let currentRound = 0
+const rounds = [
+  { target: 'A', goals: ['A', 'C', 'D'] },
+  { target: 'B', goals: ['E', 'B', 'C'] },
+  { target: 'C', goals: ['D', 'A', 'C'] },
+  { target: 'D', goals: ['B', 'D', 'E'] },
+  { target: 'E', goals: ['E', 'C', 'A'] },
+  { target: 'A', goals: ['D', 'A', 'B'] },
+  { target: 'C', goals: ['C', 'E', 'B'] },
+  { target: 'B', goals: ['A', 'D', 'B'] },
+  { target: 'E', goals: ['C', 'E', 'D'] },
+  { target: 'D', goals: ['B', 'A', 'D'] },
+]
+
+let currentKick = 0
 let score = 0
-let correctLetter = ''
 let acceptingAnswer = true
 
+const mascotPath =
+  `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
+
 export function renderActivity1() {
-  currentRound = 0
+  currentKick = 0
   score = 0
   acceptingAnswer = true
 
-  renderGame()
-  createRound()
+  renderGameScreen()
+  loadRound()
 }
 
-function renderGame() {
+function renderGameScreen() {
   document.querySelector('#app').innerHTML = `
-    <main class="smash-page">
-      <section class="smash-window">
-        <header class="smash-header">
+    <main class="soccer-game-page">
+      <section class="soccer-game-window">
+        <header class="soccer-game-header">
           <button
-            id="smash-home-button"
-            class="smash-back-button"
+            id="soccer-home-button"
+            class="soccer-back-button"
             type="button"
+            aria-label="Return home"
           >
             ←
           </button>
 
-          <div class="smash-title">
-            <span>SORA KIDS</span>
-            <strong>Letter Smash</strong>
+          <div>
+            <p>SORA KIDS</p>
+            <h1>Letter Goal</h1>
           </div>
 
-          <div class="smash-score">
+          <div class="soccer-score-box">
             <span>Score</span>
-            <strong id="smash-score-value">0 / ${totalRounds}</strong>
+            <strong id="soccer-score">0 / ${TOTAL_KICKS}</strong>
           </div>
         </header>
 
-        <div class="smash-progress-track">
-          <div id="smash-progress-bar" class="smash-progress-bar"></div>
+        <div class="soccer-progress-track">
+          <div
+            id="soccer-progress-bar"
+            class="soccer-progress-bar"
+          ></div>
         </div>
 
-        <section class="smash-coach">
+        <section class="soccer-coach">
           <img
-            id="smash-mascot"
-            class="smash-mascot"
-            src="/sora-phonics-practice/mascot/cloud_smile_clean.png"
-            alt="SORA mascot"
+            id="soccer-mascot"
+            class="soccer-mascot"
+            src="${mascotPath}"
+            alt="SORA cloud mascot"
           />
 
-          <div class="smash-speech">
-            <p id="smash-coach-message">
-              Listen carefully and tap the correct letter!
+          <div class="soccer-speech-bubble">
+            <p id="soccer-coach-message">
+              Listen carefully!
             </p>
           </div>
         </section>
 
-        <section class="smash-instructions">
+        <section class="soccer-instruction">
           <p>
-            Round <span id="smash-round-number">1</span>
-            of ${totalRounds}
+            Kick <span id="soccer-kick-number">1</span>
+            of ${TOTAL_KICKS}
           </p>
 
-          <h1>Which letter did you hear?</h1>
+          <h2 id="soccer-question">
+            Which letter did you hear?
+          </h2>
 
           <button
-            id="smash-sound-button"
-            class="smash-sound-button"
+            id="soccer-listen-button"
+            class="soccer-listen-button"
             type="button"
           >
             🔊 Hear it again
@@ -79,190 +99,247 @@ function renderGame() {
         </section>
 
         <section
-          id="smash-letter-grid"
-          class="smash-letter-grid"
+          id="soccer-goals"
+          class="soccer-goals"
+          aria-label="Choose a letter goal"
         ></section>
 
+        <div class="soccer-ball-area">
+          <div id="soccer-ball" class="soccer-ball">⚽</div>
+        </div>
+
         <p
-          id="smash-feedback"
-          class="smash-feedback"
+          id="soccer-feedback"
+          class="soccer-feedback"
           aria-live="polite"
         >
-          Choose one letter.
+          Tap the correct goal!
         </p>
       </section>
     </main>
   `
 
   document
-    .querySelector('#smash-home-button')
+    .querySelector('#soccer-home-button')
     .addEventListener('click', () => {
+      window.speechSynthesis?.cancel()
       navigate('home')
     })
 
   document
-    .querySelector('#smash-sound-button')
-    .addEventListener('click', speakLetter)
+    .querySelector('#soccer-listen-button')
+    .addEventListener('click', speakInstruction)
 }
 
-function createRound() {
+function loadRound() {
   acceptingAnswer = true
 
-  correctLetter =
-    letters[Math.floor(Math.random() * letters.length)]
+  const round = rounds[currentKick]
 
-  const shuffledLetters = shuffle([...letters])
+  document.querySelector('#soccer-kick-number').textContent =
+    currentKick + 1
 
-  document.querySelector('#smash-round-number').textContent =
-    currentRound + 1
+  document.querySelector('#soccer-score').textContent =
+    `${score} / ${TOTAL_KICKS}`
 
-  document.querySelector('#smash-score-value').textContent =
-    `${score} / ${totalRounds}`
+  document.querySelector('#soccer-progress-bar').style.width =
+    `${(currentKick / TOTAL_KICKS) * 100}%`
 
-  document.querySelector('#smash-progress-bar').style.width =
-    `${(currentRound / totalRounds) * 100}%`
+  document.querySelector('#soccer-coach-message').textContent =
+    `Kick the ball into the ${round.target} goal!`
 
-  document.querySelector('#smash-feedback').textContent =
-    'Choose one letter.'
+  document.querySelector('#soccer-feedback').textContent =
+    'Tap the correct goal!'
 
-  document.querySelector('#smash-feedback').className =
-    'smash-feedback'
+  document.querySelector('#soccer-feedback').className =
+    'soccer-feedback'
 
-  document.querySelector('#smash-coach-message').textContent =
-    'Listen carefully and tap the correct letter!'
+  const goalsContainer =
+    document.querySelector('#soccer-goals')
 
-  const grid = document.querySelector('#smash-letter-grid')
-
-  grid.innerHTML = shuffledLetters
+  goalsContainer.innerHTML = round.goals
     .map(
-      (letter) => `
+      (letter, index) => `
         <button
-          class="smash-letter-button"
+          class="soccer-goal soccer-goal-${index + 1}"
           type="button"
           data-letter="${letter}"
+          data-position="${index}"
+          aria-label="Goal ${letter}"
         >
-          <span class="smash-letter">${letter}</span>
+          <span class="soccer-goal-net">🥅</span>
+          <strong>${letter}</strong>
         </button>
       `
     )
     .join('')
 
-  document
-    .querySelectorAll('.smash-letter-button')
-    .forEach((button) => {
-      button.addEventListener('click', () => {
-        checkAnswer(button)
-      })
+  document.querySelectorAll('.soccer-goal').forEach((goal) => {
+    goal.addEventListener('click', () => {
+      checkGoal(goal)
     })
+  })
 
-  setTimeout(speakLetter, 400)
+  resetBall()
+  setTimeout(speakInstruction, 450)
 }
 
-function speakLetter() {
+function speakInstruction() {
+  const round = rounds[currentKick]
+
+  if (!round) {
+    return
+  }
+
   if (!('speechSynthesis' in window)) {
-    document.querySelector('#smash-feedback').textContent =
-      `Tap the letter ${correctLetter}.`
+    document.querySelector('#soccer-feedback').textContent =
+      `Kick the ball into the ${round.target} goal.`
     return
   }
 
   window.speechSynthesis.cancel()
 
   const speech = new SpeechSynthesisUtterance(
-    `Tap the letter ${correctLetter}`
+    `Kick the ball into the letter ${round.target} goal`
   )
 
-  speech.rate = 0.8
+  speech.rate = 0.82
   speech.pitch = 1.05
   speech.volume = 1
 
   window.speechSynthesis.speak(speech)
 }
 
-function checkAnswer(button) {
+function checkGoal(goal) {
   if (!acceptingAnswer) {
     return
   }
 
-  const selectedLetter = button.dataset.letter
-  const feedback = document.querySelector('#smash-feedback')
-  const coachMessage = document.querySelector(
-    '#smash-coach-message'
-  )
+  const round = rounds[currentKick]
+  const chosenLetter = goal.dataset.letter
 
-  if (selectedLetter === correctLetter) {
+  if (chosenLetter === round.target) {
     acceptingAnswer = false
     score += 1
 
-    button.classList.add('smash-correct')
+    animateBallToGoal(goal)
+    goal.classList.add('soccer-correct-goal')
 
-    feedback.textContent = 'SMASH! Great job! +1'
-    feedback.className = 'smash-feedback smash-success'
+    document.querySelector('#soccer-score').textContent =
+      `${score} / ${TOTAL_KICKS}`
 
-    coachMessage.textContent = 'Amazing! You found it!'
+    document.querySelector('#soccer-feedback').textContent =
+      'GOAL! Fantastic! +1 ⭐'
 
-    document.querySelector('#smash-score-value').textContent =
-      `${score} / ${totalRounds}`
+    document.querySelector('#soccer-feedback').className =
+      'soccer-feedback soccer-correct-feedback'
+
+    document.querySelector('#soccer-coach-message').textContent =
+      'Amazing goal!'
 
     setTimeout(() => {
-      currentRound += 1
+      currentKick += 1
 
-      if (currentRound >= totalRounds) {
+      if (currentKick >= TOTAL_KICKS) {
         finishActivity()
       } else {
-        createRound()
+        loadRound()
       }
-    }, 850)
+    }, 1100)
   } else {
-    button.classList.add('smash-wrong')
+    goal.classList.add('soccer-wrong-goal')
 
-    feedback.textContent = 'Almost! Try again.'
-    feedback.className = 'smash-feedback smash-error'
+    document.querySelector('#soccer-feedback').textContent =
+      'Almost! Listen and try again.'
 
-    coachMessage.textContent = 'You can do it!'
+    document.querySelector('#soccer-feedback').className =
+      'soccer-feedback soccer-wrong-feedback'
+
+    document.querySelector('#soccer-coach-message').textContent =
+      'You can do it!'
 
     setTimeout(() => {
-      button.classList.remove('smash-wrong')
-    }, 450)
+      goal.classList.remove('soccer-wrong-goal')
+    }, 500)
   }
 }
 
+function animateBallToGoal(goal) {
+  const ball = document.querySelector('#soccer-ball')
+  const position = Number(goal.dataset.position)
+
+  ball.classList.remove(
+    'ball-to-left',
+    'ball-to-centre',
+    'ball-to-right'
+  )
+
+  void ball.offsetWidth
+
+  if (position === 0) {
+    ball.classList.add('ball-to-left')
+  } else if (position === 1) {
+    ball.classList.add('ball-to-centre')
+  } else {
+    ball.classList.add('ball-to-right')
+  }
+}
+
+function resetBall() {
+  const ball = document.querySelector('#soccer-ball')
+
+  ball.className = 'soccer-ball'
+}
+
 function finishActivity() {
-  sessionStorage.setItem('activity1Score', String(score))
-  sessionStorage.setItem('activity1Complete', 'true')
+  window.speechSynthesis?.cancel()
+
+  sessionStorage.setItem(
+    'activity1Score',
+    String(score)
+  )
+
+  sessionStorage.setItem(
+    'activity1Complete',
+    'true'
+  )
 
   document.querySelector('#app').innerHTML = `
-    <main class="smash-page">
-      <section class="smash-results">
+    <main class="soccer-game-page">
+      <section class="soccer-results-window">
+        <div class="soccer-results-stars">
+          ⭐ ⭐ ⭐
+        </div>
+
         <img
-          class="smash-results-mascot"
-          src="/sora-phonics-practice/mascot/cloud_smile_clean.png"
-          alt="Happy SORA mascot"
+          class="soccer-results-mascot"
+          src="${mascotPath}"
+          alt="Happy SORA cloud mascot"
         />
 
-        <p class="smash-results-label">ACTIVITY COMPLETE</p>
+        <p>ACTIVITY 1 COMPLETE</p>
 
-        <h1>Fantastic Smashing!</h1>
+        <h1>Fantastic Goals!</h1>
 
-        <div class="smash-final-score">
+        <div class="soccer-final-score">
           <strong>${score}</strong>
-          <span>out of ${totalRounds}</span>
+          <span>out of ${TOTAL_KICKS}</span>
         </div>
 
         <p>
-          You earned ${score} stars toward your SORA reward.
+          You earned ${score} stars toward your
+          SORA English reward!
         </p>
 
         <button
-          id="smash-results-home"
-          class="smash-primary-button"
+          id="soccer-return-home"
           type="button"
         >
-          Return Home
+          Return to Home
         </button>
 
         <button
-          id="smash-play-again"
-          class="smash-secondary-button"
+          id="soccer-play-again"
           type="button"
         >
           Play Again
@@ -272,25 +349,12 @@ function finishActivity() {
   `
 
   document
-    .querySelector('#smash-results-home')
+    .querySelector('#soccer-return-home')
     .addEventListener('click', () => {
       navigate('home')
     })
 
   document
-    .querySelector('#smash-play-again')
+    .querySelector('#soccer-play-again')
     .addEventListener('click', renderActivity1)
-}
-
-function shuffle(items) {
-  for (let index = items.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1))
-
-    ;[items[index], items[randomIndex]] = [
-      items[randomIndex],
-      items[index],
-    ]
-  }
-
-  return items
 }
