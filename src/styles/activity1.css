@@ -1094,3 +1094,23 @@ body {
     font-size: 0.74rem;
   }
 }
+
+/* Fix ball dragging */
+
+.soccer-ball-area {
+  pointer-events: auto;
+}
+
+.soccer-ball {
+  pointer-events: auto;
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  margin: 0 auto;
+  touch-action: none;
+}
+
+.soccer-ball-clone {
+  pointer-events: none;
+}
