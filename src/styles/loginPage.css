@@ -1,0 +1,568 @@
+.login-page {
+  width: 100%;
+  min-height: 100dvh;
+
+  display: grid;
+  place-items: center;
+
+  padding:
+    max(10px, env(safe-area-inset-top))
+    10px
+    max(10px, env(safe-area-inset-bottom));
+
+  overflow-x: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(255, 168, 218, 0.85),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 12%,
+      rgba(86, 233, 220, 0.75),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(255, 202, 88, 0.66),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      #fff8ef,
+      #efe9ff 52%,
+      #e9fcff
+    );
+}
+
+.login-window {
+  position: relative;
+
+  width: min(96vw, 580px);
+
+  padding: clamp(18px, 5vw, 34px);
+
+  overflow: hidden;
+
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-radius: clamp(24px, 7vw, 34px);
+
+  color: #392b48;
+  background: rgba(255, 255, 255, 0.76);
+
+  box-shadow:
+    0 28px 70px rgba(76, 43, 116, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.login-sparkle {
+  position: absolute;
+  z-index: 0;
+
+  animation:
+    login-sparkle-float 3s ease-in-out infinite;
+}
+
+.sparkle-one {
+  left: 7%;
+  top: 4%;
+
+  font-size: 1.5rem;
+}
+
+.sparkle-two {
+  right: 7%;
+  top: 10%;
+
+  font-size: 1.8rem;
+
+  animation-delay: 500ms;
+}
+
+.sparkle-three {
+  right: 12%;
+  top: 29%;
+
+  font-size: 1.2rem;
+
+  animation-delay: 900ms;
+}
+
+@keyframes login-sparkle-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(12deg);
+  }
+}
+
+.login-hero {
+  position: relative;
+  z-index: 1;
+
+  text-align: center;
+}
+
+.login-mascot-glow {
+  position: absolute;
+  left: 50%;
+  top: 0;
+
+  width: 145px;
+  height: 145px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.98),
+      rgba(123, 87, 235, 0.25) 55%,
+      transparent 73%
+    );
+
+  filter: blur(5px);
+}
+
+.login-mascot {
+  position: relative;
+  z-index: 1;
+
+  display: block;
+
+  width: min(48vw, 180px);
+  max-height: 140px;
+
+  margin: 0 auto 4px;
+
+  object-fit: contain;
+
+  animation:
+    login-mascot-float 3s ease-in-out infinite;
+}
+
+@keyframes login-mascot-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+.login-brand {
+  margin: 4px 0 0;
+
+  color: #7556e8;
+
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+}
+
+.login-hero h1 {
+  margin: 9px 0 10px;
+
+  color: #332541;
+
+  font-size: clamp(2rem, 9vw, 3.15rem);
+  line-height: 1;
+}
+
+.login-introduction {
+  max-width: 440px;
+
+  margin: 0 auto 19px;
+
+  color: #6b6173;
+
+  font-size: clamp(0.9rem, 3.8vw, 1rem);
+  line-height: 1.5;
+}
+
+.achievement-preview {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: clamp(6px, 2vw, 12px);
+
+  margin-bottom: 16px;
+}
+
+.achievement-level {
+  min-width: 0;
+
+  padding: 12px 6px;
+
+  border: 1px solid rgba(117, 86, 232, 0.16);
+  border-radius: 18px;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(243, 237, 255, 0.84)
+    );
+}
+
+.achievement-level:nth-child(2) {
+  background:
+    linear-gradient(
+      150deg,
+      #fff8d8,
+      #ffe5ae
+    );
+}
+
+.achievement-level:nth-child(3) {
+  background:
+    linear-gradient(
+      150deg,
+      #dcfbf5,
+      #ceeaff
+    );
+}
+
+.achievement-icon {
+  margin-bottom: 5px;
+
+  font-size: clamp(1.6rem, 8vw, 2.35rem);
+}
+
+.achievement-level p {
+  margin: 0 0 3px;
+
+  color: #8069c8;
+
+  font-size: clamp(0.52rem, 2.5vw, 0.65rem);
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.achievement-level strong {
+  display: block;
+
+  color: #463553;
+
+  font-size: clamp(0.75rem, 3vw, 0.95rem);
+}
+
+.achievement-level span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #776c7d;
+
+  font-size: clamp(0.62rem, 2.6vw, 0.75rem);
+}
+
+.surprise-card {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 20px;
+  padding: 14px;
+
+  border: 1px solid rgba(239, 151, 54, 0.3);
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 224, 122, 0.55),
+      rgba(255, 170, 210, 0.36),
+      rgba(93, 231, 218, 0.32)
+    );
+}
+
+.surprise-gift {
+  text-align: center;
+
+  font-size: 2.2rem;
+
+  animation:
+    gift-bounce 1.8s ease-in-out infinite;
+}
+
+@keyframes gift-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-6px) rotate(3deg);
+  }
+}
+
+.surprise-card p {
+  margin: 0 0 3px;
+
+  color: #9a6025;
+
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.surprise-card strong {
+  display: block;
+
+  color: #543c4d;
+
+  font-size: 0.95rem;
+}
+
+.surprise-card span {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #73636d;
+
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.parent-login-form {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  gap: 12px;
+}
+
+.form-heading p {
+  margin: 0 0 3px;
+
+  color: #7758df;
+
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.form-heading h2 {
+  margin: 0 0 4px;
+
+  color: #392b47;
+
+  font-size: 1.15rem;
+}
+
+.parent-login-form > label[for='parent-email'] {
+  margin-top: 3px;
+
+  color: #4f4058;
+
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+#parent-email {
+  width: 100%;
+  min-height: 54px;
+
+  padding: 0 15px;
+
+  border: 2px solid #ddd2e9;
+  border-radius: 16px;
+
+  outline: none;
+
+  color: #352842;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+#parent-email:focus {
+  border-color: #7a5ae6;
+
+  box-shadow:
+    0 0 0 4px rgba(122, 90, 230, 0.14);
+}
+
+.login-checkbox {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+  gap: 9px;
+
+  color: #554b5d;
+
+  font-size: 0.83rem;
+  font-weight: 700;
+  line-height: 1.4;
+
+  cursor: pointer;
+}
+
+.login-checkbox input {
+  width: 19px;
+  height: 19px;
+
+  margin: 1px 0 0;
+
+  accent-color: #7657e7;
+}
+
+.optional-consent {
+  color: #716775;
+  font-weight: 600;
+}
+
+.optional-consent small {
+  margin-left: 4px;
+
+  color: #8c8192;
+}
+
+.parent-start-button,
+.guest-start-button {
+  width: 100%;
+  min-height: 56px;
+
+  border-radius: 18px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.parent-start-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  margin-top: 5px;
+
+  border: 0;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7657ec,
+      #ef67ae,
+      #ff9d51
+    );
+
+  box-shadow:
+    0 13px 25px rgba(118, 87, 236, 0.28);
+}
+
+.guest-start-button {
+  border: 2px solid #7657e7;
+
+  color: #6647cf;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.parent-start-button:hover,
+.guest-start-button:hover {
+  transform: translateY(-2px);
+}
+
+.login-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 11px;
+
+  margin: 17px 0;
+
+  color: #958a9c;
+
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+
+  height: 1px;
+
+  background: #ddd4e5;
+}
+
+.guest-explanation {
+  margin: 10px 0 0;
+
+  text-align: center;
+
+  color: #83798a;
+
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.login-message {
+  min-height: 22px;
+
+  margin: 12px 0 0;
+
+  text-align: center;
+
+  font-size: 0.83rem;
+  font-weight: 800;
+}
+
+.login-message-error {
+  color: #b13d59;
+}
+
+@media (max-width: 390px) {
+  .login-window {
+    padding: 16px 13px;
+  }
+
+  .login-mascot {
+    width: 135px;
+    max-height: 105px;
+  }
+
+  .achievement-level {
+    padding-inline: 3px;
+  }
+
+  .surprise-card {
+    grid-template-columns: 42px 1fr;
+    gap: 8px;
+    padding: 11px;
+  }
+
+  .surprise-gift {
+    font-size: 1.8rem;
+  }
+}

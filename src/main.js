@@ -5,9 +5,21 @@ import {
   registerPage,
 } from './router.js'
 
-import { renderActivity1 } from './pages/Activity1.js'
-import { renderActivity2 } from './pages/Activity2.js'
-import { renderActivity3 } from './pages/Activity3.js'
+import {
+  renderLoginPage,
+} from './pages/LoginPage.js'
+
+import {
+  renderActivity1,
+} from './pages/Activity1.js'
+
+import {
+  renderActivity2,
+} from './pages/Activity2.js'
+
+import {
+  renderActivity3,
+} from './pages/Activity3.js'
 
 const app = document.querySelector('#app')
 
@@ -17,7 +29,13 @@ if (!app) {
   )
 }
 
-function renderTestHome() {
+function renderTemporaryHome() {
+  const playerMode =
+    sessionStorage.getItem('soraPlayerMode')
+
+  const parentEmail =
+    sessionStorage.getItem('soraParentEmail')
+
   app.innerHTML = `
     <main class="setup-test-page">
       <section class="setup-test-card">
@@ -29,24 +47,34 @@ function renderTestHome() {
           alt="SORA mascot"
         />
 
-        <p class="setup-test-brand">SORA ADVENTURE</p>
+        <p class="setup-test-brand">
+          SORA ADVENTURE
+        </p>
 
-        <h1>Activity Test Page</h1>
+        <h1>Choose an Activity</h1>
 
         <p>
-          Test all three activities.
+          ${
+            playerMode === 'email'
+              ? `Parent email saved: ${parentEmail}`
+              : 'Playing as a guest'
+          }
         </p>
 
         <button id="open-activity-one" type="button">
-          Open Letter Goal
+          1. Letter Goal
         </button>
 
         <button id="open-activity-two" type="button">
-          Open Animal Match
+          2. Animal Match
         </button>
 
         <button id="open-activity-three" type="button">
-          Open Sentence Builder
+          3. Word Builder
+        </button>
+
+        <button id="return-to-login" type="button">
+          Return to Parent Entry
         </button>
       </section>
     </main>
@@ -69,11 +97,18 @@ function renderTestHome() {
     .addEventListener('click', () => {
       navigate('activity3')
     })
+
+  document
+    .querySelector('#return-to-login')
+    .addEventListener('click', () => {
+      navigate('login')
+    })
 }
 
-registerPage('home', renderTestHome)
+registerPage('login', renderLoginPage)
+registerPage('home', renderTemporaryHome)
 registerPage('activity1', renderActivity1)
 registerPage('activity2', renderActivity2)
 registerPage('activity3', renderActivity3)
 
-navigate('home')
+navigate('login')
