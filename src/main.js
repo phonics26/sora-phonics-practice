@@ -7,6 +7,7 @@ import {
 
 import { renderActivity1 } from './pages/Activity1.js'
 import { renderActivity2 } from './pages/Activity2.js'
+import { renderActivity3 } from './pages/Activity3.js'
 
 const app = document.querySelector('#app')
 
@@ -33,21 +34,19 @@ function renderTestHome() {
         <h1>Activity Test Page</h1>
 
         <p>
-          Test both activities before we create Activity 3.
+          Test all three activities.
         </p>
 
-        <button
-          id="open-activity-one"
-          type="button"
-        >
+        <button id="open-activity-one" type="button">
           Open Letter Goal
         </button>
 
-        <button
-          id="open-activity-two"
-          type="button"
-        >
+        <button id="open-activity-two" type="button">
           Open Animal Match
+        </button>
+
+        <button id="open-activity-three" type="button">
+          Open Sentence Builder
         </button>
       </section>
     </main>
@@ -64,10 +63,17 @@ function renderTestHome() {
     .addEventListener('click', () => {
       navigate('activity2')
     })
+
+  document
+    .querySelector('#open-activity-three')
+    .addEventListener('click', () => {
+      navigate('activity3')
+    })
 }
 
 registerPage('home', renderTestHome)
 registerPage('activity1', renderActivity1)
 registerPage('activity2', renderActivity2)
+registerPage('activity3', renderActivity3)
 
 navigate('home')
