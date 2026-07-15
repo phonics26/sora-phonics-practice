@@ -79,9 +79,12 @@ const rounds = [
 let currentRound = 0
 let score = 0
 let acceptingAnswer = true
-let draggedButton = null
-let dragOffsetX = 0
-let dragOffsetY = 0
+
+let draggedWord = null
+let dragClone = null
+let originalRectangle = null
+let pointerOffsetX = 0
+let pointerOffsetY = 0
 
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
@@ -96,7 +99,9 @@ export function renderActivity3() {
 }
 
 function renderGame() {
-  document.querySelector('#app').innerHTML = `
+  const app = document.querySelector('#app')
+
+  app.innerHTML = `
     <main class="cvc-game-page">
       <section class="cvc-game-window">
         <header class="cvc-header">
@@ -104,6 +109,7 @@ function renderGame() {
             id="cvc-home-button"
             class="cvc-back-button"
             type="button"
+            aria-label="Return home"
           >
             ←
           </button>
@@ -143,7 +149,8 @@ function renderGame() {
 
         <section class="cvc-instruction">
           <p>
-            Round <span id="cvc-round-number">1</span>
+            Round
+            <span id="cvc-round-number">1</span>
             of ${TOTAL_ROUNDS}
           </p>
 
@@ -162,6 +169,7 @@ function renderGame() {
           <div
             id="cvc-picture"
             class="cvc-picture"
+            aria-hidden="true"
           ></div>
 
           <p class="cvc-sentence">
@@ -185,6 +193,7 @@ function renderGame() {
         <section
           id="cvc-choices"
           class="cvc-choices"
+          aria-label="Word choices"
         ></section>
 
         <p
@@ -201,20 +210,21 @@ function renderGame() {
   document
     .querySelector('#cvc-home-button')
     .addEventListener('click', () => {
-      window.speechSynthesis?.cancel()
+      cancelSpeech()
+      cleanUpDrag()
       navigate('home')
     })
 
   document
     .querySelector('#cvc-listen-button')
-    .addEventListener('click', speakSentence)
+    .addEventListener('click', speakMissingSentence)
 }
 
 function loadRound() {
+  cleanUpDrag()
   acceptingAnswer = true
 
   const round = rounds[currentRound]
-  const dropZone = document.querySelector('#cvc-drop-zone')
 
   document.querySelector('#cvc-round-number').textContent =
     currentRound + 1
@@ -237,11 +247,14 @@ function loadRound() {
   document.querySelector('#cvc-coach-message').textContent =
     'Drag the correct word into the blank!'
 
-  document.querySelector('#cvc-feedback').textContent =
+  const feedback = document.querySelector('#cvc-feedback')
+
+  feedback.textContent =
     'Drag one word into the blank.'
 
-  document.querySelector('#cvc-feedback').className =
-    'cvc-feedback'
+  feedback.className = 'cvc-feedback'
+
+  const dropZone = document.querySelector('#cvc-drop-zone')
 
   dropZone.textContent = 'Drop here'
   dropZone.className = 'cvc-drop-zone'
@@ -256,6 +269,7 @@ function loadRound() {
           class="cvc-choice"
           type="button"
           data-word="${word}"
+          aria-label="Drag the word ${word}"
         >
           ${word}
         </button>
@@ -265,129 +279,157 @@ function loadRound() {
 
   document
     .querySelectorAll('.cvc-choice')
-    .forEach(enableWordDragging)
+    .forEach((button) => {
+      button.addEventListener(
+        'pointerdown',
+        startDrag
+      )
+    })
 
-  setTimeout(speakSentence, 450)
-}
-
-function enableWordDragging(button) {
-  button.addEventListener('pointerdown', startDrag)
+  window.setTimeout(speakMissingSentence, 450)
 }
 
 function startDrag(event) {
-  if (!acceptingAnswer) {
+  if (!acceptingAnswer || draggedWord) {
     return
   }
 
   event.preventDefault()
 
-  draggedButton = event.currentTarget
+  draggedWord = event.currentTarget
+  originalRectangle =
+    draggedWord.getBoundingClientRect()
 
-  const rectangle = draggedButton.getBoundingClientRect()
+  pointerOffsetX =
+    event.clientX - originalRectangle.left
 
-  dragOffsetX = event.clientX - rectangle.left
-  dragOffsetY = event.clientY - rectangle.top
+  pointerOffsetY =
+    event.clientY - originalRectangle.top
 
-  draggedButton.setPointerCapture(event.pointerId)
-  draggedButton.classList.add('cvc-dragging')
+  dragClone = draggedWord.cloneNode(true)
 
-  draggedButton.style.width = `${rectangle.width}px`
-  draggedButton.style.height = `${rectangle.height}px`
-  draggedButton.style.left = `${rectangle.left}px`
-  draggedButton.style.top = `${rectangle.top}px`
+  dragClone.classList.add('cvc-drag-clone')
 
-  moveDraggedWord(event)
+  dragClone.style.width =
+    `${originalRectangle.width}px`
 
-  draggedButton.addEventListener(
+  dragClone.style.height =
+    `${originalRectangle.height}px`
+
+  document.body.appendChild(dragClone)
+
+  draggedWord.classList.add('cvc-choice-placeholder')
+
+  moveClone(event.clientX, event.clientY)
+
+  window.addEventListener(
     'pointermove',
-    moveDraggedWord
+    handlePointerMove
   )
 
-  draggedButton.addEventListener(
+  window.addEventListener(
     'pointerup',
-    finishDrag,
+    handlePointerUp,
     { once: true }
   )
 
-  draggedButton.addEventListener(
+  window.addEventListener(
     'pointercancel',
-    cancelDrag,
+    handlePointerCancel,
     { once: true }
   )
 }
 
-function moveDraggedWord(event) {
-  if (!draggedButton) {
+function handlePointerMove(event) {
+  if (!dragClone) {
     return
   }
 
-  draggedButton.style.left =
-    `${event.clientX - dragOffsetX}px`
+  event.preventDefault()
 
-  draggedButton.style.top =
-    `${event.clientY - dragOffsetY}px`
+  moveClone(event.clientX, event.clientY)
 
   const dropZone =
     document.querySelector('#cvc-drop-zone')
 
-  if (isPointerInside(event, dropZone)) {
-    dropZone.classList.add('cvc-drop-zone-active')
+  if (
+    isPointInsideElement(
+      event.clientX,
+      event.clientY,
+      dropZone
+    )
+  ) {
+    dropZone.classList.add(
+      'cvc-drop-zone-active'
+    )
   } else {
-    dropZone.classList.remove('cvc-drop-zone-active')
+    dropZone.classList.remove(
+      'cvc-drop-zone-active'
+    )
   }
 }
 
-function finishDrag(event) {
-  if (!draggedButton) {
-    return
-  }
-
-  const button = draggedButton
-  const dropZone =
-    document.querySelector('#cvc-drop-zone')
-
-  button.removeEventListener(
+function handlePointerUp(event) {
+  window.removeEventListener(
     'pointermove',
-    moveDraggedWord
+    handlePointerMove
   )
 
-  dropZone.classList.remove('cvc-drop-zone-active')
+  const dropZone =
+    document.querySelector('#cvc-drop-zone')
 
-  if (isPointerInside(event, dropZone)) {
-    checkDroppedWord(button)
+  dropZone.classList.remove(
+    'cvc-drop-zone-active'
+  )
+
+  const droppedInside =
+    isPointInsideElement(
+      event.clientX,
+      event.clientY,
+      dropZone
+    )
+
+  if (droppedInside && draggedWord) {
+    checkDroppedWord(draggedWord)
   } else {
-    resetDraggedWord(button)
+    returnWordToChoices()
   }
-
-  draggedButton = null
 }
 
-function cancelDrag() {
-  if (draggedButton) {
-    resetDraggedWord(draggedButton)
-  }
+function handlePointerCancel() {
+  window.removeEventListener(
+    'pointermove',
+    handlePointerMove
+  )
 
-  draggedButton = null
+  returnWordToChoices()
 }
 
-function isPointerInside(event, element) {
+function moveClone(clientX, clientY) {
+  if (!dragClone) {
+    return
+  }
+
+  dragClone.style.left =
+    `${clientX - pointerOffsetX}px`
+
+  dragClone.style.top =
+    `${clientY - pointerOffsetY}px`
+}
+
+function isPointInsideElement(
+  clientX,
+  clientY,
+  element
+) {
   const rectangle = element.getBoundingClientRect()
 
   return (
-    event.clientX >= rectangle.left &&
-    event.clientX <= rectangle.right &&
-    event.clientY >= rectangle.top &&
-    event.clientY <= rectangle.bottom
+    clientX >= rectangle.left &&
+    clientX <= rectangle.right &&
+    clientY >= rectangle.top &&
+    clientY <= rectangle.bottom
   )
-}
-
-function resetDraggedWord(button) {
-  button.classList.remove('cvc-dragging')
-
-  button.style.removeProperty('width')
-  button.style.removeProperty('height')
-  button.style.removeProperty('left')
-  button.style.removeProperty('top')
 }
 
 function checkDroppedWord(button) {
@@ -410,13 +452,22 @@ function checkDroppedWord(button) {
     acceptingAnswer = false
     score += 1
 
-    resetDraggedWord(button)
+    removeDragClone()
+
+    button.classList.remove(
+      'cvc-choice-placeholder'
+    )
+
     button.classList.add('cvc-correct')
 
     dropZone.textContent = round.target
-    dropZone.classList.add('cvc-drop-zone-correct')
+
+    dropZone.classList.add(
+      'cvc-drop-zone-correct'
+    )
 
     feedback.textContent = 'Excellent! +1 ⭐'
+
     feedback.className =
       'cvc-feedback cvc-correct-feedback'
 
@@ -430,8 +481,12 @@ function checkDroppedWord(button) {
 
     speakCompletedSentence(round)
 
-    setTimeout(() => {
+    draggedWord = null
+    originalRectangle = null
+
+    window.setTimeout(() => {
       mascot.classList.remove('cvc-celebrate')
+
       currentRound += 1
 
       if (currentRound >= TOTAL_ROUNDS) {
@@ -441,10 +496,17 @@ function checkDroppedWord(button) {
       }
     }, 1300)
   } else {
-    resetDraggedWord(button)
+    removeDragClone()
+
+    button.classList.remove(
+      'cvc-choice-placeholder'
+    )
 
     button.classList.add('cvc-wrong')
-    dropZone.classList.add('cvc-drop-zone-wrong')
+
+    dropZone.classList.add(
+      'cvc-drop-zone-wrong'
+    )
 
     feedback.textContent =
       'Almost! Try another word.'
@@ -454,14 +516,72 @@ function checkDroppedWord(button) {
 
     coach.textContent = 'Try again!'
 
-    setTimeout(() => {
+    draggedWord = null
+    originalRectangle = null
+
+    window.setTimeout(() => {
       button.classList.remove('cvc-wrong')
-      dropZone.classList.remove('cvc-drop-zone-wrong')
+
+      dropZone.classList.remove(
+        'cvc-drop-zone-wrong'
+      )
     }, 550)
   }
 }
 
-function speakSentence() {
+function returnWordToChoices() {
+  if (!draggedWord || !dragClone) {
+    cleanUpDrag()
+    return
+  }
+
+  dragClone.classList.add(
+    'cvc-drag-returning'
+  )
+
+  dragClone.style.left =
+    `${originalRectangle.left}px`
+
+  dragClone.style.top =
+    `${originalRectangle.top}px`
+
+  window.setTimeout(() => {
+    if (draggedWord) {
+      draggedWord.classList.remove(
+        'cvc-choice-placeholder'
+      )
+    }
+
+    cleanUpDrag()
+  }, 220)
+}
+
+function removeDragClone() {
+  if (dragClone) {
+    dragClone.remove()
+    dragClone = null
+  }
+}
+
+function cleanUpDrag() {
+  window.removeEventListener(
+    'pointermove',
+    handlePointerMove
+  )
+
+  removeDragClone()
+
+  if (draggedWord) {
+    draggedWord.classList.remove(
+      'cvc-choice-placeholder'
+    )
+  }
+
+  draggedWord = null
+  originalRectangle = null
+}
+
+function speakMissingSentence() {
   const round = rounds[currentRound]
 
   if (!round) {
@@ -488,7 +608,8 @@ function speak(text) {
 
   window.speechSynthesis.cancel()
 
-  const speech = new SpeechSynthesisUtterance(text)
+  const speech =
+    new SpeechSynthesisUtterance(text)
 
   speech.rate = 0.78
   speech.pitch = 1.03
@@ -497,8 +618,15 @@ function speak(text) {
   window.speechSynthesis.speak(speech)
 }
 
+function cancelSpeech() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
+}
+
 function finishActivity() {
-  window.speechSynthesis?.cancel()
+  cancelSpeech()
+  cleanUpDrag()
 
   sessionStorage.setItem(
     'activity3Score',
@@ -563,6 +691,8 @@ function finishActivity() {
 
   document
     .querySelector('#cvc-play-again')
-    .addEventListener('click', renderActivity3)
+    .addEventListener(
+      'click',
+      renderActivity3
+    )
 }
-
