@@ -20,6 +20,12 @@ let currentKick = 0
 let score = 0
 let acceptingAnswer = true
 
+let draggedBall = null
+let dragClone = null
+let originalBallRect = null
+let pointerOffsetX = 0
+let pointerOffsetY = 0
+
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
 
@@ -47,7 +53,7 @@ function renderGameScreen() {
           </button>
 
           <div>
-            <p>SORA KIDS</p>
+            <p>SORA ADVENTURE</p>
             <h1>Letter Goal</h1>
           </div>
 
@@ -74,7 +80,7 @@ function renderGameScreen() {
 
           <div class="soccer-speech-bubble">
             <p id="soccer-coach-message">
-              Listen carefully!
+              Drag the ball into the correct goal!
             </p>
           </div>
         </section>
@@ -85,9 +91,7 @@ function renderGameScreen() {
             of ${TOTAL_KICKS}
           </p>
 
-          <h2 id="soccer-question">
-            Which letter did you hear?
-          </h2>
+          <h2>Which letter did you hear?</h2>
 
           <button
             id="soccer-listen-button"
@@ -101,11 +105,22 @@ function renderGameScreen() {
         <section
           id="soccer-goals"
           class="soccer-goals"
-          aria-label="Choose a letter goal"
+          aria-label="Letter goals"
         ></section>
 
+        <p class="soccer-drag-instruction">
+          Touch and drag the ball into the correct goal.
+        </p>
+
         <div class="soccer-ball-area">
-          <div id="soccer-ball" class="soccer-ball">⚽</div>
+          <button
+            id="soccer-ball"
+            class="soccer-ball"
+            type="button"
+            aria-label="Drag the soccer ball"
+          >
+            ⚽
+          </button>
         </div>
 
         <p
@@ -113,7 +128,7 @@ function renderGameScreen() {
           class="soccer-feedback"
           aria-live="polite"
         >
-          Tap the correct goal!
+          Drag the ball into a goal!
         </p>
       </section>
     </main>
@@ -122,16 +137,22 @@ function renderGameScreen() {
   document
     .querySelector('#soccer-home-button')
     .addEventListener('click', () => {
-      window.speechSynthesis?.cancel()
+      cancelSpeech()
+      cleanUpBallDrag()
       navigate('home')
     })
 
   document
     .querySelector('#soccer-listen-button')
     .addEventListener('click', speakInstruction)
+
+  document
+    .querySelector('#soccer-ball')
+    .addEventListener('pointerdown', startBallDrag)
 }
 
 function loadRound() {
+  cleanUpBallDrag()
   acceptingAnswer = true
 
   const round = rounds[currentKick]
@@ -146,10 +167,10 @@ function loadRound() {
     `${(currentKick / TOTAL_KICKS) * 100}%`
 
   document.querySelector('#soccer-coach-message').textContent =
-    `Kick the ball into the ${round.target} goal!`
+    `Drag the ball into the ${round.target} goal!`
 
   document.querySelector('#soccer-feedback').textContent =
-    'Tap the correct goal!'
+    'Drag the ball into a goal!'
 
   document.querySelector('#soccer-feedback').className =
     'soccer-feedback'
@@ -160,84 +181,173 @@ function loadRound() {
   goalsContainer.innerHTML = round.goals
     .map(
       (letter, index) => `
-        <button
+        <div
           class="soccer-goal soccer-goal-${index + 1}"
-          type="button"
           data-letter="${letter}"
           data-position="${index}"
           aria-label="Goal ${letter}"
         >
           <span class="soccer-goal-net">🥅</span>
           <strong>${letter}</strong>
-        </button>
+        </div>
       `
     )
     .join('')
 
-  document.querySelectorAll('.soccer-goal').forEach((goal) => {
-    goal.addEventListener('click', () => {
-      checkGoal(goal)
-    })
-  })
-
   resetBall()
-  setTimeout(speakInstruction, 450)
+  window.setTimeout(speakInstruction, 450)
 }
 
-function speakInstruction() {
-  const round = rounds[currentKick]
-
-  if (!round) {
+function startBallDrag(event) {
+  if (!acceptingAnswer || dragClone) {
     return
   }
 
-  if (!('speechSynthesis' in window)) {
-    document.querySelector('#soccer-feedback').textContent =
-      `Kick the ball into the ${round.target} goal.`
-    return
-  }
+  event.preventDefault()
 
-  window.speechSynthesis.cancel()
+  draggedBall = event.currentTarget
+  originalBallRect = draggedBall.getBoundingClientRect()
 
-  const speech = new SpeechSynthesisUtterance(
-    `Kick the ball into the letter ${round.target} goal`
+  pointerOffsetX =
+    event.clientX - originalBallRect.left
+
+  pointerOffsetY =
+    event.clientY - originalBallRect.top
+
+  dragClone = draggedBall.cloneNode(true)
+
+  dragClone.classList.add('soccer-ball-clone')
+
+  dragClone.style.width =
+    `${originalBallRect.width}px`
+
+  dragClone.style.height =
+    `${originalBallRect.height}px`
+
+  document.body.appendChild(dragClone)
+
+  draggedBall.classList.add('soccer-ball-placeholder')
+
+  moveBallClone(event.clientX, event.clientY)
+
+  window.addEventListener(
+    'pointermove',
+    handleBallMove
   )
 
-  speech.rate = 0.82
-  speech.pitch = 1.05
-  speech.volume = 1
+  window.addEventListener(
+    'pointerup',
+    handleBallDrop,
+    { once: true }
+  )
 
-  window.speechSynthesis.speak(speech)
+  window.addEventListener(
+    'pointercancel',
+    handleBallCancel,
+    { once: true }
+  )
 }
 
-function checkGoal(goal) {
-  if (!acceptingAnswer) {
+function handleBallMove(event) {
+  if (!dragClone) {
     return
   }
 
-  const round = rounds[currentKick]
-  const chosenLetter = goal.dataset.letter
+  event.preventDefault()
 
-  if (chosenLetter === round.target) {
+  moveBallClone(event.clientX, event.clientY)
+
+  document
+    .querySelectorAll('.soccer-goal')
+    .forEach((goal) => {
+      if (
+        isPointInsideElement(
+          event.clientX,
+          event.clientY,
+          goal
+        )
+      ) {
+        goal.classList.add('soccer-goal-active')
+      } else {
+        goal.classList.remove('soccer-goal-active')
+      }
+    })
+}
+
+function handleBallDrop(event) {
+  window.removeEventListener(
+    'pointermove',
+    handleBallMove
+  )
+
+  const goals =
+    [...document.querySelectorAll('.soccer-goal')]
+
+  goals.forEach((goal) => {
+    goal.classList.remove('soccer-goal-active')
+  })
+
+  const droppedGoal = goals.find((goal) =>
+    isPointInsideElement(
+      event.clientX,
+      event.clientY,
+      goal
+    )
+  )
+
+  if (droppedGoal) {
+    checkDroppedGoal(droppedGoal)
+  } else {
+    returnBallToStart()
+  }
+}
+
+function handleBallCancel() {
+  window.removeEventListener(
+    'pointermove',
+    handleBallMove
+  )
+
+  returnBallToStart()
+}
+
+function checkDroppedGoal(goal) {
+  const round = rounds[currentKick]
+  const selectedLetter = goal.dataset.letter
+
+  const feedback =
+    document.querySelector('#soccer-feedback')
+
+  const coach =
+    document.querySelector('#soccer-coach-message')
+
+  const mascot =
+    document.querySelector('#soccer-mascot')
+
+  if (selectedLetter === round.target) {
     acceptingAnswer = false
     score += 1
 
-    animateBallToGoal(goal)
+    moveCloneIntoGoal(goal)
     goal.classList.add('soccer-correct-goal')
+    mascot.classList.add('soccer-mascot-celebrate')
+
+    feedback.textContent =
+      'GOAL! Fantastic! +1 ⭐'
+
+    feedback.className =
+      'soccer-feedback soccer-correct-feedback'
+
+    coach.textContent = 'Amazing goal!'
 
     document.querySelector('#soccer-score').textContent =
       `${score} / ${TOTAL_KICKS}`
 
-    document.querySelector('#soccer-feedback').textContent =
-      'GOAL! Fantastic! +1 ⭐'
+    window.setTimeout(() => {
+      mascot.classList.remove(
+        'soccer-mascot-celebrate'
+      )
 
-    document.querySelector('#soccer-feedback').className =
-      'soccer-feedback soccer-correct-feedback'
-
-    document.querySelector('#soccer-coach-message').textContent =
-      'Amazing goal!'
-
-    setTimeout(() => {
       currentKick += 1
 
       if (currentKick >= TOTAL_KICKS) {
@@ -249,50 +359,178 @@ function checkGoal(goal) {
   } else {
     goal.classList.add('soccer-wrong-goal')
 
-    document.querySelector('#soccer-feedback').textContent =
-      'Almost! Listen and try again.'
+    feedback.textContent =
+      'Almost! Try another goal.'
 
-    document.querySelector('#soccer-feedback').className =
+    feedback.className =
       'soccer-feedback soccer-wrong-feedback'
 
-    document.querySelector('#soccer-coach-message').textContent =
-      'You can do it!'
+    coach.textContent = 'Try again!'
 
-    setTimeout(() => {
+    returnBallToStart()
+
+    window.setTimeout(() => {
       goal.classList.remove('soccer-wrong-goal')
     }, 500)
   }
 }
 
-function animateBallToGoal(goal) {
-  const ball = document.querySelector('#soccer-ball')
-  const position = Number(goal.dataset.position)
+function moveCloneIntoGoal(goal) {
+  if (!dragClone) {
+    return
+  }
 
-  ball.classList.remove(
-    'ball-to-left',
-    'ball-to-centre',
-    'ball-to-right'
+  const goalRect = goal.getBoundingClientRect()
+
+  dragClone.classList.add('soccer-ball-scored')
+
+  dragClone.style.left =
+    `${goalRect.left + goalRect.width / 2 -
+      originalBallRect.width / 2}px`
+
+  dragClone.style.top =
+    `${goalRect.top + goalRect.height / 2 -
+      originalBallRect.height / 2}px`
+
+  window.setTimeout(() => {
+    removeBallClone()
+
+    if (draggedBall) {
+      draggedBall.classList.remove(
+        'soccer-ball-placeholder'
+      )
+    }
+
+    draggedBall = null
+    originalBallRect = null
+  }, 650)
+}
+
+function returnBallToStart() {
+  if (!dragClone || !originalBallRect) {
+    cleanUpBallDrag()
+    return
+  }
+
+  dragClone.classList.add(
+    'soccer-ball-returning'
   )
 
-  void ball.offsetWidth
+  dragClone.style.left =
+    `${originalBallRect.left}px`
 
-  if (position === 0) {
-    ball.classList.add('ball-to-left')
-  } else if (position === 1) {
-    ball.classList.add('ball-to-centre')
-  } else {
-    ball.classList.add('ball-to-right')
+  dragClone.style.top =
+    `${originalBallRect.top}px`
+
+  window.setTimeout(() => {
+    cleanUpBallDrag()
+  }, 220)
+}
+
+function moveBallClone(clientX, clientY) {
+  if (!dragClone) {
+    return
   }
+
+  dragClone.style.left =
+    `${clientX - pointerOffsetX}px`
+
+  dragClone.style.top =
+    `${clientY - pointerOffsetY}px`
+}
+
+function isPointInsideElement(
+  clientX,
+  clientY,
+  element
+) {
+  const rect = element.getBoundingClientRect()
+
+  return (
+    clientX >= rect.left &&
+    clientX <= rect.right &&
+    clientY >= rect.top &&
+    clientY <= rect.bottom
+  )
+}
+
+function removeBallClone() {
+  if (dragClone) {
+    dragClone.remove()
+    dragClone = null
+  }
+}
+
+function cleanUpBallDrag() {
+  window.removeEventListener(
+    'pointermove',
+    handleBallMove
+  )
+
+  removeBallClone()
+
+  if (draggedBall) {
+    draggedBall.classList.remove(
+      'soccer-ball-placeholder'
+    )
+  }
+
+  document
+    .querySelectorAll('.soccer-goal')
+    .forEach((goal) => {
+      goal.classList.remove('soccer-goal-active')
+    })
+
+  draggedBall = null
+  originalBallRect = null
 }
 
 function resetBall() {
   const ball = document.querySelector('#soccer-ball')
 
-  ball.className = 'soccer-ball'
+  if (ball) {
+    ball.className = 'soccer-ball'
+  }
+}
+
+function speakInstruction() {
+  const round = rounds[currentKick]
+
+  if (!round) {
+    return
+  }
+
+  speak(
+    `Drag the ball into the letter ${round.target} goal`
+  )
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    return
+  }
+
+  window.speechSynthesis.cancel()
+
+  const speech =
+    new SpeechSynthesisUtterance(text)
+
+  speech.rate = 0.82
+  speech.pitch = 1.05
+  speech.volume = 1
+
+  window.speechSynthesis.speak(speech)
+}
+
+function cancelSpeech() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
 }
 
 function finishActivity() {
-  window.speechSynthesis?.cancel()
+  cancelSpeech()
+  cleanUpBallDrag()
 
   sessionStorage.setItem(
     'activity1Score',
@@ -356,5 +594,8 @@ function finishActivity() {
 
   document
     .querySelector('#soccer-play-again')
-    .addEventListener('click', renderActivity1)
+    .addEventListener(
+      'click',
+      renderActivity1
+    )
 }

@@ -980,3 +980,117 @@ body {
     font-size: 1.35rem;
   }
 }
+/* ========================================
+   TOUCH DRAGGING FOR THE SOCCER BALL
+======================================== */
+
+.soccer-drag-instruction {
+  margin: 10px 0 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.soccer-ball {
+  width: clamp(58px, 16vw, 88px);
+  height: clamp(58px, 16vw, 88px);
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  padding: 0;
+
+  background: transparent;
+
+  font-size: clamp(3rem, 14vw, 5rem);
+
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+
+  cursor: grab;
+
+  filter:
+    drop-shadow(0 12px 8px rgba(20, 13, 45, 0.35));
+}
+
+.soccer-ball:active {
+  cursor: grabbing;
+}
+
+.soccer-ball-placeholder {
+  opacity: 0.25;
+}
+
+.soccer-ball-clone {
+  position: fixed;
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  padding: 0;
+
+  background: transparent;
+
+  font-size: clamp(3rem, 14vw, 5rem);
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(0 18px 12px rgba(20, 13, 45, 0.4));
+
+  transform: scale(1.08);
+
+  transition:
+    left 220ms ease,
+    top 220ms ease,
+    transform 220ms ease,
+    opacity 220ms ease;
+}
+
+.soccer-ball-returning {
+  transform: scale(1);
+}
+
+.soccer-ball-scored {
+  transform:
+    scale(0.55)
+    rotate(540deg);
+
+  opacity: 0.25;
+}
+
+.soccer-goal-active {
+  transform: translateY(-5px) scale(1.05);
+
+  filter: brightness(1.25);
+
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.2),
+    0 18px 30px rgba(14, 72, 43, 0.3);
+}
+
+.soccer-mascot-celebrate {
+  animation: soccer-mascot-celebrate 500ms ease;
+}
+
+@keyframes soccer-mascot-celebrate {
+  35% {
+    transform: scale(1.2) rotate(-8deg);
+  }
+
+  70% {
+    transform: scale(1.15) rotate(8deg);
+  }
+}
+
+@media (max-width: 420px) {
+  .soccer-drag-instruction {
+    margin-top: 7px;
+    font-size: 0.74rem;
+  }
+}
