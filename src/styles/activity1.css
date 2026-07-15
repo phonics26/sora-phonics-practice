@@ -1101,16 +1101,49 @@ body {
   pointer-events: auto;
 }
 
-.soccer-ball {
-  pointer-events: auto;
+.soccer-ball:not(.soccer-ball-clone) {
   position: relative;
   left: auto;
+  top: auto;
   bottom: auto;
   transform: none;
   margin: 0 auto;
+
+  pointer-events: auto;
   touch-action: none;
 }
 
-.soccer-ball-clone {
+.soccer-ball.soccer-ball-clone {
+  position: fixed !important;
+  z-index: 9999;
+
+  left: 0;
+  top: 0;
+  bottom: auto;
+
+  margin: 0;
+
   pointer-events: none;
+
+  transform: scale(1.08);
+
+  transition: none;
+}
+
+.soccer-ball.soccer-ball-clone.soccer-ball-returning {
+  transition:
+    left 220ms ease,
+    top 220ms ease,
+    transform 220ms ease;
+}
+
+.soccer-ball.soccer-ball-clone.soccer-ball-scored {
+  transition:
+    left 650ms ease,
+    top 650ms ease,
+    transform 650ms ease,
+    opacity 650ms ease;
+
+  transform: scale(0.55) rotate(540deg);
+  opacity: 0.25;
 }
