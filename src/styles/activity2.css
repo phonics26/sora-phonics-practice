@@ -1,0 +1,542 @@
+.animal-game-page {
+  width: 100%;
+  min-height: 100dvh;
+
+  display: grid;
+  place-items: center;
+
+  padding:
+    max(8px, env(safe-area-inset-top))
+    8px
+    max(8px, env(safe-area-inset-bottom));
+
+  overflow-x: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 12% 10%,
+      rgba(255, 189, 88, 0.7),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(76, 232, 215, 0.65),
+      transparent 32%
+    ),
+    linear-gradient(
+      150deg,
+      #315ca8,
+      #674ec4 52%,
+      #e56ba9
+    );
+}
+
+.animal-game-window,
+.animal-results-window {
+  width: min(96vw, 900px);
+  min-width: 0;
+
+  padding: clamp(12px, 3vw, 26px);
+
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  border-radius: clamp(20px, 5vw, 30px);
+
+  color: white;
+  background: rgba(255, 255, 255, 0.17);
+
+  box-shadow:
+    0 28px 70px rgba(25, 18, 72, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.animal-header {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.animal-back-button {
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 14px;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+
+  font-size: 1.25rem;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.animal-title p {
+  margin: 0 0 3px;
+
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+
+  opacity: 0.8;
+}
+
+.animal-title h1 {
+  margin: 0;
+
+  color: white;
+
+  font-size: clamp(1.05rem, 5vw, 1.7rem);
+}
+
+.animal-score-box {
+  min-width: 72px;
+
+  padding: 7px 9px;
+
+  border-radius: 14px;
+
+  text-align: center;
+
+  color: #4c3869;
+  background: rgba(255, 255, 255, 0.91);
+}
+
+.animal-score-box span {
+  display: block;
+
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.animal-score-box strong {
+  font-size: 0.9rem;
+}
+
+.animal-progress-track {
+  width: 100%;
+  height: 12px;
+
+  margin: 14px 0;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.animal-progress-bar {
+  width: 0;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #64efdb,
+      #ffe36b,
+      #ff8fc0
+    );
+
+  transition: width 350ms ease;
+}
+
+.animal-coach {
+  width: min(100%, 560px);
+
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: clamp(60px, 18vw, 95px) minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+
+.animal-mascot {
+  width: 100%;
+  max-width: 95px;
+  height: auto;
+
+  object-fit: contain;
+
+  animation: animal-float 2.8s ease-in-out infinite;
+}
+
+@keyframes animal-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+.animal-celebrate {
+  animation: animal-celebrate 500ms ease;
+}
+
+@keyframes animal-celebrate {
+  35% {
+    transform: scale(1.2) rotate(-8deg);
+  }
+
+  70% {
+    transform: scale(1.15) rotate(8deg);
+  }
+}
+
+.animal-speech-bubble {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 12px 14px;
+
+  border-radius: 18px;
+
+  color: #533d70;
+  background: rgba(255, 255, 255, 0.93);
+
+  font-size: clamp(0.78rem, 3.5vw, 0.92rem);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.animal-speech-bubble::before {
+  content: '';
+
+  position: absolute;
+  left: -10px;
+  top: 24px;
+
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 11px solid rgba(255, 255, 255, 0.93);
+}
+
+.animal-speech-bubble p {
+  margin: 0;
+}
+
+.animal-instruction {
+  margin: 15px auto 10px;
+
+  text-align: center;
+}
+
+.animal-instruction p {
+  margin: 0 0 5px;
+
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  opacity: 0.82;
+}
+
+.animal-instruction h2 {
+  margin: 5px 0 11px;
+
+  font-size: clamp(1.35rem, 7vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.animal-listen-button {
+  min-height: 44px;
+
+  padding: 0 17px;
+
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  border-radius: 15px;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.animal-choices {
+  width: min(100%, 760px);
+
+  margin: 18px auto 0;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(7px, 2vw, 20px);
+}
+
+.animal-choice {
+  min-width: 0;
+  min-height: clamp(150px, 40vw, 250px);
+
+  padding: 12px 6px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid rgba(255, 255, 255, 0.52);
+  border-radius: clamp(18px, 5vw, 27px);
+
+  color: #4a365d;
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(242, 236, 255, 0.9)
+    );
+
+  box-shadow:
+    0 16px 28px rgba(26, 15, 69, 0.25),
+    inset 0 1px 0 white;
+
+  cursor: pointer;
+
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.animal-choice:nth-child(2) {
+  background:
+    linear-gradient(
+      155deg,
+      #fff7d1,
+      #ffe0a5
+    );
+}
+
+.animal-choice:nth-child(3) {
+  background:
+    linear-gradient(
+      155deg,
+      #dcfbf5,
+      #c7ecff
+    );
+}
+
+.animal-choice:hover {
+  transform: translateY(-4px);
+}
+
+.animal-icon {
+  display: block;
+
+  font-size: clamp(4rem, 19vw, 8rem);
+  line-height: 1;
+
+  filter:
+    drop-shadow(0 10px 9px rgba(50, 35, 73, 0.18));
+}
+
+.animal-choice strong {
+  margin-top: 10px;
+
+  font-size: clamp(0.9rem, 4vw, 1.3rem);
+  text-transform: capitalize;
+}
+
+.animal-correct {
+  animation: animal-correct 700ms ease;
+}
+
+@keyframes animal-correct {
+  45% {
+    transform: scale(1.08);
+    filter: brightness(1.15);
+  }
+}
+
+.animal-wrong {
+  animation: animal-shake 420ms ease;
+}
+
+@keyframes animal-shake {
+  25% {
+    transform: translateX(-9px);
+  }
+
+  50% {
+    transform: translateX(9px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+.animal-feedback {
+  min-height: 27px;
+
+  margin: 15px 0 0;
+
+  text-align: center;
+
+  font-size: clamp(0.82rem, 3.6vw, 1rem);
+  font-weight: 900;
+}
+
+.animal-correct-feedback {
+  color: #fff179;
+}
+
+.animal-wrong-feedback {
+  color: #ffd2df;
+}
+
+.animal-results-window {
+  width: min(94vw, 520px);
+
+  padding: 30px 23px;
+
+  text-align: center;
+}
+
+.animal-results-stars {
+  font-size: 2rem;
+  letter-spacing: 6px;
+}
+
+.animal-results-mascot {
+  display: block;
+
+  width: min(60vw, 220px);
+  max-height: 170px;
+
+  margin: 10px auto;
+
+  object-fit: contain;
+
+  animation: animal-float 2.8s ease-in-out infinite;
+}
+
+.animal-results-window > p:first-of-type {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.animal-results-window h1 {
+  color: white;
+}
+
+.animal-final-score {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+
+  margin: 16px 0;
+}
+
+.animal-final-score strong {
+  font-size: 4.5rem;
+  line-height: 1;
+}
+
+.animal-primary-button,
+.animal-secondary-button {
+  width: 100%;
+  min-height: 55px;
+
+  margin-top: 13px;
+
+  border-radius: 18px;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.animal-primary-button {
+  border: 0;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7657ec,
+      #f065af,
+      #ff9e52
+    );
+}
+
+.animal-secondary-button {
+  border: 2px solid white;
+
+  color: white;
+  background: transparent;
+}
+
+@media (max-width: 420px) {
+  .animal-game-page {
+    place-items: start center;
+    padding: 6px;
+  }
+
+  .animal-game-window {
+    padding: 10px;
+  }
+
+  .animal-header {
+    grid-template-columns: 38px minmax(0, 1fr) 66px;
+    gap: 6px;
+  }
+
+  .animal-back-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .animal-score-box {
+    min-width: 66px;
+    padding: 6px;
+  }
+
+  .animal-progress-track {
+    margin: 10px 0;
+  }
+
+  .animal-coach {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  .animal-mascot {
+    max-width: 60px;
+  }
+
+  .animal-instruction {
+    margin-top: 10px;
+  }
+
+  .animal-choices {
+    margin-top: 11px;
+    gap: 6px;
+  }
+
+  .animal-choice {
+    min-height: 135px;
+    padding-inline: 3px;
+  }
+
+  .animal-icon {
+    font-size: clamp(3.3rem, 18vw, 5rem);
+  }
+}

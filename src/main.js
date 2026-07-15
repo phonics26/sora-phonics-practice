@@ -6,6 +6,7 @@ import {
 } from './router.js'
 
 import { renderActivity1 } from './pages/Activity1.js'
+import { renderActivity2 } from './pages/Activity2.js'
 
 const app = document.querySelector('#app')
 
@@ -27,32 +28,46 @@ function renderTestHome() {
           alt="SORA mascot"
         />
 
-        <p class="setup-test-brand">SORA KIDS</p>
+        <p class="setup-test-brand">SORA ADVENTURE</p>
 
-        <h1>Activity 1 Test</h1>
+        <h1>Activity Test Page</h1>
 
         <p>
-          Press the button to test the soccer game.
+          Test both activities before we create Activity 3.
         </p>
 
         <button
-          id="open-activity-button"
+          id="open-activity-one"
           type="button"
         >
           Open Letter Goal
+        </button>
+
+        <button
+          id="open-activity-two"
+          type="button"
+        >
+          Open Animal Match
         </button>
       </section>
     </main>
   `
 
   document
-    .querySelector('#open-activity-button')
+    .querySelector('#open-activity-one')
     .addEventListener('click', () => {
       navigate('activity1')
+    })
+
+  document
+    .querySelector('#open-activity-two')
+    .addEventListener('click', () => {
+      navigate('activity2')
     })
 }
 
 registerPage('home', renderTestHome)
 registerPage('activity1', renderActivity1)
+registerPage('activity2', renderActivity2)
 
 navigate('home')
