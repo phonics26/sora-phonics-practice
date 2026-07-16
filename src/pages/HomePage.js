@@ -1,226 +1,434 @@
 import '../styles/homePage.css'
 import { navigate } from '../router.js'
 
+const mascotPath =
+  `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
+
 export function renderHomePage() {
   const app = document.querySelector('#app')
 
-  const activity1Score = Number(
-    sessionStorage.getItem('activity1Score') || 0
-  )
+  const activity1Score = getScore('activity1Score')
+  const activity2Score = getScore('activity2Score')
+  const activity3Score = getScore('activity3Score')
 
-  const activity1Complete =
-    sessionStorage.getItem('activity1Complete') === 'true'
+  const activity1Complete = isComplete('activity1Complete')
+  const activity2Complete = isComplete('activity2Complete')
+  const activity3Complete = isComplete('activity3Complete')
 
-  const totalStars = activity1Score
+  const totalStars =
+    activity1Score +
+    activity2Score +
+    activity3Score
+
   const progressPercentage = Math.min(
     (totalStars / 30) * 100,
     100
   )
 
+  const playerMode =
+    sessionStorage.getItem('soraPlayerMode') || 'guest'
+
+  const parentEmail =
+    sessionStorage.getItem('soraParentEmail') || ''
+
+  const completedActivities = [
+    activity1Complete,
+    activity2Complete,
+    activity3Complete,
+  ].filter(Boolean).length
+
+  const currentReward = getRewardPreview(totalStars)
+
   app.innerHTML = `
-    <main class="home-page">
-      <section class="home-window">
-        <header class="home-header">
+    <main class="adventure-home-page">
+      <section class="adventure-home-window">
+        <div class="home-decoration home-star-one">⭐</div>
+        <div class="home-decoration home-star-two">✨</div>
+        <div class="home-decoration home-star-three">⭐</div>
+
+        <header class="adventure-home-header">
           <div>
-            <p class="home-brand">SORA KIDS</p>
-            <h1>English Adventure</h1>
-          </div>
+            <p class="adventure-brand">
+              SORA ADVENTURE
+            </p>
 
-          <button
-            id="home-menu-button"
-            class="home-menu-button"
-            type="button"
-            aria-label="Open menu"
-          >
-            ☰
-          </button>
-        </header>
+            <h1>Choose Your Quest!</h1>
 
-        <section class="home-coach">
-          <div class="home-mascot-glow"></div>
-
-          <img
-            class="home-mascot"
-            src="/sora-phonics-practice/mascot/cloud_smile_clean.png"
-            alt="SORA cloud mascot"
-          />
-
-          <div class="home-speech">
-            <strong>Welcome!</strong>
-            <p>
-              Complete three games to unlock your SORA English reward!
+            <p class="player-status">
+              ${
+                playerMode === 'email'
+                  ? `Playing with parent email: ${escapeHtml(parentEmail)}`
+                  : 'Playing as a guest adventurer'
+              }
             </p>
           </div>
-        </section>
 
-        <section class="progress-card">
-          <div class="progress-heading">
+          <img
+            class="adventure-home-mascot"
+            src="${mascotPath}"
+            alt="SORA cloud mascot"
+          />
+        </header>
+
+        <section class="adventure-progress-card">
+          <div class="adventure-progress-heading">
             <div>
-              <p>Your progress</p>
-              <strong id="star-total">
-                ${totalStars} / 30 Stars
+              <p>YOUR ADVENTURE</p>
+
+              <strong>
+                ${completedActivities} of 3 quests complete
               </strong>
             </div>
 
-            <span class="progress-star">⭐</span>
+            <div class="adventure-star-total">
+              <span>⭐</span>
+              <strong>${totalStars}/30</strong>
+            </div>
           </div>
 
-          <div class="home-progress-track">
+          <div class="adventure-progress-track">
             <div
-              id="home-progress-bar"
-              class="home-progress-bar"
+              class="adventure-progress-bar"
               style="width: ${progressPercentage}%"
             ></div>
           </div>
+
+          <p class="adventure-next-reward">
+            ${currentReward}
+          </p>
         </section>
 
-        <section class="activity-section">
-          <div class="section-heading">
+        <section class="quest-map">
+          ${renderActivityOne({
+            complete: activity1Complete,
+            score: activity1Score,
+          })}
+
+          <div class="quest-path ${
+            activity1Complete ? 'path-complete' : ''
+          }">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          ${renderActivityTwo({
+            unlocked: activity1Complete,
+            complete: activity2Complete,
+            score: activity2Score,
+          })}
+
+          <div class="quest-path ${
+            activity2Complete ? 'path-complete' : ''
+          }">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          ${renderActivityThree({
+            unlocked: activity2Complete,
+            complete: activity3Complete,
+            score: activity3Score,
+          })}
+        </section>
+
+        <section class="reward-ladder">
+          <div class="reward-ladder-heading">
             <div>
-              <p class="section-label">TODAY'S ADVENTURE</p>
-              <h2>Choose a game</h2>
+              <p>COMPLETE THE QUESTS</p>
+              <h2>Unlock Your Surprise Reward!</h2>
             </div>
 
-            <span>
-              ${activity1Complete ? '2' : '1'} of 3 unlocked
-            </span>
+            <span class="reward-gift">🎁</span>
           </div>
 
-          <div class="activity-list">
-            <article class="activity-card activity-unlocked">
-              <div class="activity-number">
-                ${activity1Complete ? '✓' : '1'}
-              </div>
+          <div class="reward-levels">
+            <article class="${
+              totalStars >= 10
+                ? 'reward-level reward-unlocked'
+                : 'reward-level'
+            }">
+              <div class="reward-level-icon">🌱</div>
+              <p>LEVEL 1</p>
+              <strong>Explorer</strong>
+              <span>10–17 stars</span>
+              <small>1 week of ASEP free</small>
+            </article>
 
-              <div class="activity-icon letter-icon">
-                ABC
-              </div>
+            <article class="${
+              totalStars >= 18
+                ? 'reward-level reward-unlocked'
+                : 'reward-level'
+            }">
+              <div class="reward-level-icon">🏆</div>
+              <p>LEVEL 2</p>
+              <strong>Champion</strong>
+              <span>18–25 stars</span>
+              <small>2 weeks of ASEP free</small>
+            </article>
 
-              <div class="activity-information">
-                <p>ACTIVITY 1</p>
-                <h3>Letter Smash</h3>
-                <span>
-                  ${
-                    activity1Complete
-                      ? `Completed — ${activity1Score} stars earned.`
-                      : 'Listen and tap the correct letter.'
-                  }
-                </span>
-              </div>
+            <article class="${
+              totalStars >= 26
+                ? 'reward-level reward-unlocked'
+                : 'reward-level'
+            }">
+              <div class="reward-level-icon">🌟</div>
+              <p>LEVEL 3</p>
+              <strong>SORA Star</strong>
+              <span>26–30 stars</span>
+              <small>First month of ASEP free</small>
+            </article>
+          </div>
+        </section>
 
+        ${
+          activity3Complete
+            ? `
               <button
-                id="activity-one-button"
-                class="play-button"
+                id="view-results-button"
+                class="view-results-button"
                 type="button"
               >
-                ${activity1Complete ? 'Play Again' : 'Play'}
+                <span>🎁</span>
+                Open My Surprise Reward
               </button>
-            </article>
+            `
+            : `
+              <div class="locked-results-message">
+                <span>🔒</span>
 
-            <article
-              class="activity-card ${
-                activity1Complete
-                  ? 'activity-unlocked'
-                  : 'activity-locked'
-              }"
-            >
-              <div class="activity-number">2</div>
-
-              <div class="activity-icon goal-icon">
-                ⚽
+                <p>
+                  Complete all three quests to open your
+                  surprise reward.
+                </p>
               </div>
+            `
+        }
 
-              <div class="activity-information">
-                <p>ACTIVITY 2</p>
-                <h3>Sound Goal</h3>
-                <span>
-                  ${
-                    activity1Complete
-                      ? 'Ready to play.'
-                      : 'Complete Activity 1 to unlock.'
-                  }
-                </span>
-              </div>
-
-              ${
-                activity1Complete
-                  ? `
-                    <button
-                      id="activity-two-button"
-                      class="play-button"
-                      type="button"
-                    >
-                      Play
-                    </button>
-                  `
-                  : `
-                    <div class="lock-badge" aria-label="Locked">
-                      🔒
-                    </div>
-                  `
-              }
-            </article>
-
-            <article class="activity-card activity-locked">
-              <div class="activity-number">3</div>
-
-              <div class="activity-icon match-icon">
-                🧩
-              </div>
-
-              <div class="activity-information">
-                <p>ACTIVITY 3</p>
-                <h3>Memory Match</h3>
-                <span>
-                  Complete Activity 2 to unlock.
-                </span>
-              </div>
-
-              <div class="lock-badge" aria-label="Locked">
-                🔒
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section class="reward-card">
-          <div class="reward-symbol">🎁</div>
-
-          <div class="reward-information">
-            <p>YOUR SORA REWARD</p>
-            <h2>Complete all three games</h2>
-            <span>
-              Unlock an eligible ASEP lesson, Coffee Hours session,
-              or FUNdation offer.
-            </span>
-          </div>
-
-          <div class="reward-stars">
-            <strong>${totalStars}</strong>
-            <span>/ 30 ⭐</span>
-          </div>
-        </section>
-
-        <p
-          id="home-message"
-          class="home-message"
-          aria-live="polite"
-        ></p>
+        <button
+          id="return-login-button"
+          class="return-login-button"
+          type="button"
+        >
+          Return to Parent Entry
+        </button>
       </section>
     </main>
   `
 
-  const activityOneButton = document.querySelector(
-    '#activity-one-button'
-  )
-
-  activityOneButton.addEventListener('click', () => {
-    navigate('activity1')
+  addButtonListeners({
+    activity1Complete,
+    activity2Complete,
+    activity3Complete,
   })
+}
 
-  const activityTwoButton = document.querySelector(
-    '#activity-two-button'
-  )
+function renderActivityOne({ complete, score }) {
+  return `
+    <article class="quest-card quest-one quest-unlocked">
+      <div class="quest-number">
+        ${complete ? '✓' : '1'}
+      </div>
+
+      <div class="quest-picture soccer-picture">
+        <div class="mini-goal">🥅</div>
+        <div class="mini-ball">⚽</div>
+        <div class="mini-letter">A</div>
+      </div>
+
+      <div class="quest-information">
+        <p>QUEST 1</p>
+        <h2>Letter Goal Quest</h2>
+
+        <span>
+          Drag the soccer ball into the correct letter goal.
+        </span>
+
+        ${
+          complete
+            ? `
+              <div class="quest-score">
+                ⭐ ${score}/10 stars earned
+              </div>
+            `
+            : `
+              <div class="quest-ready">
+                Ready to begin!
+              </div>
+            `
+        }
+      </div>
+
+      <button
+        id="activity-one-button"
+        class="quest-play-button"
+        type="button"
+      >
+        ${complete ? 'Play Again' : 'Start Quest'}
+      </button>
+    </article>
+  `
+}
+
+function renderActivityTwo({
+  unlocked,
+  complete,
+  score,
+}) {
+  return `
+    <article class="quest-card quest-two ${
+      unlocked
+        ? 'quest-unlocked'
+        : 'quest-locked'
+    }">
+      <div class="quest-number">
+        ${complete ? '✓' : '2'}
+      </div>
+
+      <div class="quest-picture animal-picture">
+        <span>🐶</span>
+        <span>🐱</span>
+        <span>🐰</span>
+        <div class="sound-symbol">🔊</div>
+      </div>
+
+      <div class="quest-information">
+        <p>QUEST 2</p>
+        <h2>Animal Sound Safari</h2>
+
+        <span>
+          Listen carefully and find the correct animal.
+        </span>
+
+        ${
+          complete
+            ? `
+              <div class="quest-score">
+                ⭐ ${score}/10 stars earned
+              </div>
+            `
+            : unlocked
+              ? `
+                <div class="quest-ready">
+                  New quest unlocked!
+                </div>
+              `
+              : `
+                <div class="quest-locked-text">
+                  Complete Quest 1 to unlock.
+                </div>
+              `
+        }
+      </div>
+
+      ${
+        unlocked
+          ? `
+            <button
+              id="activity-two-button"
+              class="quest-play-button"
+              type="button"
+            >
+              ${complete ? 'Play Again' : 'Start Quest'}
+            </button>
+          `
+          : `
+            <div class="quest-lock">🔒</div>
+          `
+      }
+    </article>
+  `
+}
+
+function renderActivityThree({
+  unlocked,
+  complete,
+  score,
+}) {
+  return `
+    <article class="quest-card quest-three ${
+      unlocked
+        ? 'quest-unlocked'
+        : 'quest-locked'
+    }">
+      <div class="quest-number">
+        ${complete ? '✓' : '3'}
+      </div>
+
+      <div class="quest-picture word-picture">
+        <div class="word-sentence">
+          The <span>___</span> is here.
+        </div>
+
+        <div class="word-pieces">
+          <span>cat</span>
+          <span>dog</span>
+          <span>pig</span>
+        </div>
+      </div>
+
+      <div class="quest-information">
+        <p>FINAL QUEST</p>
+        <h2>Word Magic Builder</h2>
+
+        <span>
+          Drag the correct CVC word into the sentence.
+        </span>
+
+        ${
+          complete
+            ? `
+              <div class="quest-score">
+                ⭐ ${score}/10 stars earned
+              </div>
+            `
+            : unlocked
+              ? `
+                <div class="quest-ready">
+                  Final quest unlocked!
+                </div>
+              `
+              : `
+                <div class="quest-locked-text">
+                  Complete Quest 2 to unlock.
+                </div>
+              `
+        }
+      </div>
+
+      ${
+        unlocked
+          ? `
+            <button
+              id="activity-three-button"
+              class="quest-play-button"
+              type="button"
+            >
+              ${complete ? 'Play Again' : 'Start Quest'}
+            </button>
+          `
+          : `
+            <div class="quest-lock">🔒</div>
+          `
+      }
+    </article>
+  `
+}
+
+function addButtonListeners({
+  activity1Complete,
+  activity2Complete,
+  activity3Complete,
+}) {
+  document
+    .querySelector('#activity-one-button')
+    .addEventListener('click', () => {
+      navigate('activity1')
+    })
+
+  const activityTwoButton =
+    document.querySelector('#activity-two-button')
 
   if (activityTwoButton) {
     activityTwoButton.addEventListener('click', () => {
@@ -228,14 +436,62 @@ export function renderHomePage() {
     })
   }
 
-  const menuButton = document.querySelector(
-    '#home-menu-button'
+  const activityThreeButton =
+    document.querySelector('#activity-three-button')
+
+  if (activityThreeButton) {
+    activityThreeButton.addEventListener('click', () => {
+      navigate('activity3')
+    })
+  }
+
+  const resultsButton =
+    document.querySelector('#view-results-button')
+
+  if (resultsButton) {
+    resultsButton.addEventListener('click', () => {
+      navigate('results')
+    })
+  }
+
+  document
+    .querySelector('#return-login-button')
+    .addEventListener('click', () => {
+      navigate('login')
+    })
+}
+
+function getScore(key) {
+  return Number(
+    sessionStorage.getItem(key) || 0
   )
+}
 
-  const message = document.querySelector('#home-message')
+function isComplete(key) {
+  return sessionStorage.getItem(key) === 'true'
+}
 
-  menuButton.addEventListener('click', () => {
-    message.textContent =
-      'The menu will be added later.'
-  })
+function getRewardPreview(totalStars) {
+  if (totalStars >= 26) {
+    return '🌟 Level 3 unlocked: First month of ASEP free!'
+  }
+
+  if (totalStars >= 18) {
+    return '🏆 Level 2 unlocked: Two weeks of ASEP free!'
+  }
+
+  if (totalStars >= 10) {
+    return '🌱 Level 1 unlocked: One week of ASEP free!'
+  }
+
+  return 'Collect 10 stars to unlock your first reward!'
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
 }
