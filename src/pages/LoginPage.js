@@ -1,5 +1,6 @@
 import '../styles/loginPage.css'
 import { navigate } from '../router.js'
+import { supabase } from '../services/supabase.js'
 
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
@@ -36,7 +37,6 @@ export function renderLoginPage() {
         <section class="achievement-preview">
           <article class="achievement-level">
             <div class="achievement-icon">🌱</div>
-
             <div>
               <p>LEVEL 1</p>
               <strong>Explorer</strong>
@@ -46,7 +46,6 @@ export function renderLoginPage() {
 
           <article class="achievement-level">
             <div class="achievement-icon">🏆</div>
-
             <div>
               <p>LEVEL 2</p>
               <strong>Champion</strong>
@@ -56,7 +55,6 @@ export function renderLoginPage() {
 
           <article class="achievement-level">
             <div class="achievement-icon">🌟</div>
-
             <div>
               <p>LEVEL 3</p>
               <strong>SORA Star</strong>
@@ -155,19 +153,16 @@ export function renderLoginPage() {
     </main>
   `
 
-  const form = document.querySelector(
-    '#parent-login-form'
-  )
+  const form =
+    document.querySelector('#parent-login-form')
 
-  const guestButton = document.querySelector(
-    '#guest-start-button'
-  )
+  const guestButton =
+    document.querySelector('#guest-start-button')
 
-  const message = document.querySelector(
-    '#login-message'
-  )
+  const message =
+    document.querySelector('#login-message')
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault()
 
     const email = document
@@ -195,6 +190,30 @@ export function renderLoginPage() {
       showLoginError(
         message,
         'Please agree to receive the result and reward email.'
+      )
+      return
+    }
+
+    message.textContent = 'Saving your email...'
+    message.className = 'login-message'
+
+    const { error } = await supabase
+      .from('sora_adventure_results')
+      .insert({
+        email,
+        player_mode: 'email',
+        marketing_consent: marketingConsent,
+      })
+
+    if (error) {
+      console.error(
+        'Supabase email save error:',
+        error
+      )
+
+      showLoginError(
+        message,
+        'We could not save the email. Please try again.'
       )
       return
     }
