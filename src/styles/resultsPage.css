@@ -1,0 +1,643 @@
+.results-page {
+  width: 100%;
+  min-height: 100dvh;
+
+  display: grid;
+  place-items: center;
+
+  padding: 10px;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 12% 10%,
+      rgba(255, 207, 94, 0.7),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 88% 12%,
+      rgba(88, 235, 218, 0.7),
+      transparent 32%
+    ),
+    linear-gradient(
+      145deg,
+      #51389f,
+      #8357d2 50%,
+      #ed6dac
+    );
+}
+
+.results-window {
+  width: min(96vw, 620px);
+
+  padding: clamp(20px, 5vw, 34px);
+
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 30px;
+
+  text-align: center;
+  color: white;
+
+  background: rgba(255, 255, 255, 0.17);
+
+  box-shadow:
+    0 28px 70px rgba(28, 15, 75, 0.38);
+
+  backdrop-filter: blur(22px);
+}
+
+.results-stars {
+  font-size: 2rem;
+  letter-spacing: 6px;
+}
+
+.results-mascot {
+  width: min(52vw, 190px);
+  max-height: 140px;
+
+  object-fit: contain;
+
+  animation:
+    results-float 2.8s ease-in-out infinite;
+}
+
+@keyframes results-float {
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+.results-brand {
+  margin: 5px 0;
+
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.results-window > h1 {
+  margin: 8px 0 18px;
+
+  color: white;
+
+  font-size: clamp(2rem, 8vw, 3rem);
+}
+
+.results-score-card {
+  padding: 18px;
+
+  border-radius: 22px;
+
+  color: #503b67;
+  background: rgba(255, 255, 255, 0.93);
+}
+
+.results-score-card > span {
+  font-weight: 800;
+}
+
+.results-score-card div {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+}
+
+.results-score-card strong {
+  font-size: 4rem;
+}
+
+.results-score-card small {
+  font-weight: 800;
+}
+
+.results-breakdown {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin: 14px 0;
+}
+
+.results-breakdown article {
+  padding: 12px 5px;
+
+  border-radius: 17px;
+
+  color: #4e3a61;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.results-breakdown span {
+  font-size: 1.7rem;
+}
+
+.results-breakdown p {
+  margin: 5px 0;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.reward-reveal {
+  padding: 20px;
+
+  border-radius: 23px;
+
+  color: #513d56;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff2ad,
+      #ffd1df,
+      #c9fff5
+    );
+}
+
+.reward-present {
+  font-size: 3.2rem;
+}
+
+.reward-reveal p {
+  margin: 5px 0;
+
+  color: #85642b;
+
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.reward-reveal h2 {
+  margin: 5px 0;
+
+  font-size: 1.8rem;
+}
+
+.reward-coupon {
+  display: block;
+
+  margin: 10px 0;
+
+  color: #744bd5;
+
+  font-size: clamp(1.35rem, 6vw, 2rem);
+}
+
+.reward-reveal span {
+  display: block;
+
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.reward-email-form,
+.results-email-confirmation {
+  margin-top: 16px;
+  padding: 17px;
+
+  border-radius: 22px;
+
+  text-align: left;
+
+  color: #4d3b5d;
+  background: rgba(255, 255, 255, 0.91);
+}
+
+.reward-email-form p {
+  margin: 0;
+
+  color: #7758dd;
+
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.reward-email-form h2 {
+  margin: 4px 0 14px;
+}
+
+.reward-email-form label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+#reward-parent-email {
+  width: 100%;
+  min-height: 52px;
+
+  padding: 0 14px;
+
+  border: 2px solid #ddd1e8;
+  border-radius: 15px;
+}
+
+.reward-checkbox {
+  display: grid !important;
+  grid-template-columns: 22px 1fr;
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.reward-checkbox input {
+  width: 19px;
+  height: 19px;
+
+  accent-color: #7657e7;
+}
+
+.reward-checkbox small {
+  color: #877c8b;
+}
+
+.reward-email-form button,
+.results-home-button,
+.results-restart-button {
+  width: 100%;
+  min-height: 54px;
+
+  margin-top: 13px;
+
+  border-radius: 17px;
+
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.reward-email-form button,
+.results-home-button {
+  border: 0;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7657ec,
+      #ed67ae,
+      #ff9d51
+    );
+}
+
+.results-restart-button {
+  border: 2px solid white;
+
+  color: white;
+  background: transparent;
+}
+
+.results-email-confirmation {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.results-email-confirmation > span {
+  font-size: 2rem;
+}
+
+.results-email-confirmation p {
+  margin: 0 0 4px;
+}
+
+.results-message {
+  min-height: 24px;
+
+  margin: 13px 0 0;
+
+  font-weight: 900;
+}
+
+.results-message-error {
+  color: #ffd2df;
+}
+
+.results-message-success {
+  color: #fff18a;
+}
+
+@media (max-width: 420px) {
+  .results-window {
+    padding: 17px 12px;
+    border-radius: 22px;
+  }
+
+  .results-breakdown {
+    gap: 5px;
+  }
+
+  .results-breakdown article {
+    padding-inline: 3px;
+  }
+}
+/* ========================================
+   REWARD CEREMONY
+======================================== */
+
+.results-window {
+  position: relative;
+  overflow: hidden;
+}
+
+.results-confetti span {
+  position: absolute;
+  z-index: 0;
+
+  animation:
+    results-confetti-float 3s ease-in-out infinite;
+}
+
+.results-confetti span:nth-child(1) {
+  left: 7%;
+  top: 5%;
+}
+
+.results-confetti span:nth-child(2) {
+  right: 8%;
+  top: 8%;
+  animation-delay: 300ms;
+}
+
+.results-confetti span:nth-child(3) {
+  left: 12%;
+  top: 31%;
+  animation-delay: 600ms;
+}
+
+.results-confetti span:nth-child(4) {
+  right: 10%;
+  top: 38%;
+  animation-delay: 900ms;
+}
+
+.results-confetti span:nth-child(5) {
+  left: 50%;
+  top: 2%;
+  animation-delay: 1200ms;
+}
+
+@keyframes results-confetti-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(15deg);
+  }
+}
+
+.results-introduction {
+  margin: -8px 0 17px;
+
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.mystery-reward {
+  margin-top: 16px;
+  padding: 22px 16px;
+
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 238, 163, 0.88),
+      rgba(255, 190, 220, 0.88),
+      rgba(193, 255, 245, 0.88)
+    );
+
+  color: #513c59;
+
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+}
+
+.mystery-label {
+  margin: 0;
+
+  color: #8a6224;
+
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.reward-present-button {
+  display: grid;
+  place-items: center;
+  gap: 7px;
+
+  width: 100%;
+
+  border: 0;
+
+  color: #6847c9;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.reward-present {
+  display: block;
+
+  font-size: clamp(5rem, 24vw, 8rem);
+
+  animation:
+    reward-present-shake 1.8s ease-in-out infinite;
+
+  filter:
+    drop-shadow(0 13px 10px rgba(68, 43, 95, 0.25));
+}
+
+@keyframes reward-present-shake {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+
+  25% {
+    transform: rotate(4deg) translateY(-4px);
+  }
+
+  50% {
+    transform: rotate(-4deg) translateY(-7px);
+  }
+
+  75% {
+    transform: rotate(3deg) translateY(-4px);
+  }
+}
+
+.reward-present-button strong {
+  font-size: 1.1rem;
+}
+
+.mystery-hint {
+  margin: 8px 0 0;
+
+  color: #756776;
+
+  font-size: 0.8rem;
+}
+
+.reward-opening {
+  animation: reward-opening 550ms ease forwards;
+}
+
+@keyframes reward-opening {
+  50% {
+    transform: scale(1.07) rotate(2deg);
+  }
+
+  100% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+
+.reward-hidden {
+  display: none;
+}
+
+.reward-reveal {
+  margin-top: 16px;
+
+  animation:
+    reward-reveal-entrance 650ms ease;
+}
+
+@keyframes reward-reveal-entrance {
+  from {
+    transform: translateY(22px) scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.reward-celebration {
+  font-size: 2rem;
+  letter-spacing: 5px;
+}
+
+.reward-prize {
+  display: block;
+
+  margin: 12px 0;
+
+  color: #7043d2;
+
+  font-size: clamp(1.45rem, 7vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.reward-code-card {
+  margin-top: 15px;
+  padding: 12px;
+
+  border: 2px dashed rgba(112, 67, 210, 0.42);
+  border-radius: 15px;
+
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.reward-code-card small {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #76687c;
+}
+
+.reward-code-card strong {
+  color: #5732ae;
+
+  font-size: clamp(1rem, 5vw, 1.4rem);
+  letter-spacing: 1px;
+}
+
+.reward-claim-area {
+  animation:
+    reward-claim-entrance 600ms ease;
+}
+
+@keyframes reward-claim-entrance {
+  from {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.reward-email-heading {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.reward-email-heading > span {
+  font-size: 2rem;
+}
+
+.reward-email-description {
+  color: #756a7b;
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.reward-email-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.results-email-confirmation small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #766b7b;
+}
+
+.reward-claimed-message {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.reward-claimed-message > span {
+  font-size: 2rem;
+}
+
+.reward-claimed-message strong {
+  color: #4f9d72;
+}
+
+.reward-claimed-message p {
+  margin: 4px 0 0;
+
+  color: #655a6b;
+}
