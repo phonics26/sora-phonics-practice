@@ -3,7 +3,7 @@ import { navigate } from '../router.js'
 import { supabase } from '../services/supabase.js'
 
 const mascotPath =
-  `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
+`${import.meta.env.BASE_URL}mascot/cloud_blue_transparent.png`
 
 export function renderLoginPage() {
   const app = document.querySelector('#app')
