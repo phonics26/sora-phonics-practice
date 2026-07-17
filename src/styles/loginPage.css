@@ -566,3 +566,227 @@
     font-size: 1.8rem;
   }
 }
+/* ========================================
+   QUEST PREVIEW CARDS
+======================================== */
+
+.achievement-preview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.quest-preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  min-width: 0;
+  padding: 16px;
+
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 24px;
+
+  text-align: center;
+  color: #4d3b5d;
+
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 30px rgba(66, 44, 100, 0.15);
+}
+
+.quest-preview-one {
+  background: linear-gradient(
+    145deg,
+    rgba(246, 239, 255, 0.96),
+    rgba(255, 255, 255, 0.9)
+  );
+}
+
+.quest-preview-two {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 241, 191, 0.96),
+    rgba(255, 250, 229, 0.92)
+  );
+}
+
+.quest-preview-three {
+  background: linear-gradient(
+    145deg,
+    rgba(201, 244, 255, 0.96),
+    rgba(231, 250, 255, 0.92)
+  );
+}
+
+.quest-preview-picture {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  min-height: 115px;
+  padding: 10px;
+
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.soccer-preview {
+  overflow: hidden;
+}
+
+.preview-goal {
+  font-size: 3rem;
+}
+
+.preview-ball {
+  position: absolute;
+  left: 18%;
+  bottom: 17px;
+
+  font-size: 2rem;
+  transform: rotate(-12deg);
+}
+
+.preview-letter {
+  position: absolute;
+  right: 18%;
+  top: 18px;
+
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  color: white;
+  background: #7657ec;
+
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.animal-preview {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+
+  font-size: 2rem;
+}
+
+.preview-sound {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+
+  font-size: 1.4rem;
+}
+
+.word-preview {
+  align-content: center;
+  gap: 10px;
+}
+
+.preview-sentence {
+  padding: 8px 10px;
+
+  border-radius: 10px;
+
+  background: white;
+
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.preview-sentence span {
+  color: #7657ec;
+}
+
+.preview-words {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.preview-words span {
+  padding: 5px 9px;
+
+  border-radius: 8px;
+
+  color: white;
+  background: #ed67ae;
+
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.quest-preview-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quest-preview-content p {
+  margin: 0;
+
+  color: #7657ec;
+
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.quest-preview-content strong {
+  font-size: 1.25rem;
+}
+
+.quest-preview-content > span {
+  min-height: 42px;
+
+  color: #756a7b;
+
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.quest-preview-content small {
+  display: block;
+
+  margin-top: auto;
+  padding-top: 8px;
+
+  color: #7043d2;
+
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+@media (max-width: 760px) {
+  .achievement-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-preview-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+
+    text-align: left;
+  }
+
+  .quest-preview-picture {
+    min-height: 105px;
+  }
+}
+
+@media (max-width: 430px) {
+  .quest-preview-card {
+    grid-template-columns: 1fr;
+
+    text-align: center;
+  }
+}

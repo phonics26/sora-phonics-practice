@@ -1,4 +1,4 @@
-﻿import '../styles/homePage.css'
+import '../styles/homePage.css'
 import { navigate } from '../router.js'
 
 const mascotPath =

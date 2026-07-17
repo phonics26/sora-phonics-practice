@@ -34,36 +34,67 @@ export function renderLoginPage() {
           </p>
         </section>
 
-        <section class="achievement-preview">
-          <article class="achievement-level">
-            <div class="achievement-icon">🌱</div>
-            <div>
-              <p>LEVEL 1</p>
-              <strong>Explorer</strong>
-              <span>10–17 stars</span>
-            </div>
-          </article>
+<section class="achievement-preview">
 
-          <article class="achievement-level">
-            <div class="achievement-icon">🏆</div>
-            <div>
-              <p>LEVEL 2</p>
-              <strong>Champion</strong>
-              <span>18–25 stars</span>
-            </div>
-          </article>
+  <article class="achievement-level quest-preview-card quest-preview-one">
+      <div class="quest-picture soccer-picture">
 
-          <article class="achievement-level">
-            <div class="achievement-icon">🌟</div>
-            <div>
-              <p>LEVEL 3</p>
-              <strong>SORA Star</strong>
-              <span>26–30 stars</span>
-            </div>
-          </article>
-        </section>
+        <div class="mini-goal">🥅</div>
 
-        <section class="surprise-card">
+        <div class="mini-ball">⚽</div>
+
+        <div class="mini-letter">A</div>
+
+      </div>
+
+    <div class="quest-preview-content">
+      <p>QUEST 1</p>
+      <strong>Letter Goal</strong>
+      <span>
+
+    </div>
+  </article>
+
+  <article class="achievement-level quest-preview-card quest-preview-two">
+      <div class="quest-picture animal-picture">
+        <span>🐶</span>
+        <span>🐱</span>
+        <span>🐰</span>
+        <div class="sound-symbol">🔊</div>
+      </div>
+
+    <div class="quest-preview-content">
+      <p>QUEST 2</p>
+      <strong>Animal Match</strong>
+      <span>
+
+    </div>
+  </article>
+
+  <article class="achievement-level quest-preview-card quest-preview-three">
+    <div class="quest-preview-picture word-preview">
+      <div class="preview-sentence">
+        The <span>___</span> is here.
+      </div>
+
+      <div class="preview-words">
+        <span>cat</span>
+        <span>dog</span>
+        <span>pig</span>
+      </div>
+    </div>
+
+    <div class="quest-preview-content">
+      <p>QUEST 3</p>
+      <strong>Word Builder</strong>
+      <span>
+
+    </div>
+  </article>
+
+</section>
+
+<section class="surprise-card">
           <div class="surprise-gift">🎁</div>
 
           <div>

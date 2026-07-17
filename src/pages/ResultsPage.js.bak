@@ -1,4 +1,4 @@
-﻿import '../styles/resultsPage.css'
+import '../styles/resultsPage.css'
 import { navigate } from '../router.js'
 import { supabase } from '../services/supabase.js'
 
@@ -33,6 +33,7 @@ export function renderResultsPage() {
     sessionStorage.getItem('soraMarketingConsent') === 'true'
 
   const completedQuestCount = getCompletedQuestCount()
+
   const reward = getReward(completedQuestCount)
 
   document.querySelector('#app').innerHTML = `
@@ -59,14 +60,14 @@ export function renderResultsPage() {
         <h1>Congratulations!</h1>
 
         <p class="results-introduction">
-          🎉 You completed ${completedQuestCount} of 3 English quests!
+          You completed ${completedQuestCount} of 3 English quests.
         </p>
 
         <p
           class="results-quest-badge"
           style="margin:0.35rem 0 0;font-weight:700;color:#3b82f6;"
         >
-          🏅 <strong>${completedQuestCount}/3 quests completed</strong>
+          🗺️ <strong>${completedQuestCount}/3 quests completed</strong>
         </p>
 
         <section class="results-score-card">
@@ -208,31 +209,29 @@ export function renderResultsPage() {
   const openRewardButton =
     document.querySelector('#open-reward-button')
 
-  if (openRewardButton) {
-    openRewardButton.addEventListener('click', async () => {
-      revealReward()
+  openRewardButton.addEventListener('click', async () => {
+    revealReward()
 
-      if (playerMode === 'email' && savedEmail) {
-        await saveCompletedResult({
-          email: savedEmail,
-          playerMode: 'email',
-          marketingConsent,
-          activity1Score,
-          activity2Score,
-          activity3Score,
-          totalScore,
-          completedQuests: completedQuestCount,
-          reward,
-        })
-      }
-    })
-  }
+    if (playerMode === 'email' && savedEmail) {
+      await saveCompletedResult({
+        email: savedEmail,
+        playerMode: 'email',
+        marketingConsent,
+        activity1Score,
+        activity2Score,
+        activity3Score,
+        totalScore,
+        completedQuests: completedQuestCount,
+        reward,
+      })
+    }
+  })
 
   if (playerMode === 'guest') {
     const guestForm =
       document.querySelector('#reward-email-form')
 
-    guestForm?.addEventListener(
+    guestForm.addEventListener(
       'submit',
       async (event) => {
         event.preventDefault()
@@ -251,13 +250,13 @@ export function renderResultsPage() {
 
   document
     .querySelector('#results-home-button')
-    ?.addEventListener('click', () => {
+    .addEventListener('click', () => {
       navigate('home')
     })
 
   document
     .querySelector('#results-restart-button')
-    ?.addEventListener('click', () => {
+    .addEventListener('click', () => {
       clearAdventureSession()
       navigate('login')
     })
@@ -279,12 +278,12 @@ function revealReward() {
   const rewardClaimArea =
     document.querySelector('#reward-claim-area')
 
-  mysteryReward?.classList.add('reward-opening')
+  mysteryReward.classList.add('reward-opening')
 
   window.setTimeout(() => {
-    mysteryReward?.classList.add('reward-hidden')
-    rewardReveal?.classList.remove('reward-hidden')
-    rewardClaimArea?.classList.remove('reward-hidden')
+    mysteryReward.classList.add('reward-hidden')
+    rewardReveal.classList.remove('reward-hidden')
+    rewardClaimArea.classList.remove('reward-hidden')
   }, 550)
 }
 
@@ -370,27 +369,20 @@ async function saveGuestReward({
   completedQuests,
   reward,
 }) {
-  const alreadySaved =
-    sessionStorage.getItem('soraFinalResultSaved') === 'true'
-
-  if (alreadySaved) {
-    return
-  }
-
   const message =
     document.querySelector('#results-message')
 
   const submitButton =
     document.querySelector('#claim-reward-button')
 
-  const emailInput =
-    document.querySelector('#reward-parent-email')
+  const email = document
+    .querySelector('#reward-parent-email')
+    .value
+    .trim()
 
-  const email = emailInput?.value?.trim() || ''
-
-  const marketingConsent =
-    document.querySelector('#reward-marketing-consent')
-      ?.checked || false
+  const marketingConsent = document
+    .querySelector('#reward-marketing-consent')
+    .checked
 
   if (!email) {
     showResultsError(
@@ -400,27 +392,13 @@ async function saveGuestReward({
     return
   }
 
-  if (submitButton) {
-    submitButton.disabled = true
-    submitButton.textContent = 'Saving...'
-  }
+  submitButton.disabled = true
+  submitButton.textContent = 'Saving...'
 
   message.textContent =
     'Saving your result and reward...'
 
   message.className = 'results-message'
-
-  const achievementLevel =
-    completedQuests >= 3
-      ? 3
-      : completedQuests === 2
-        ? 2
-        : completedQuests === 1
-          ? 1
-          : 0
-
-  const rewardName =
-    getRewardNameFromCount(completedQuests)
 
   const { error } = await supabase
     .from('sora_adventure_results')
@@ -433,41 +411,33 @@ async function saveGuestReward({
       activity3_score: activity3Score,
       total_score: totalScore,
       completed_quests: completedQuests,
-      achievement_level: achievementLevel,
+      achievement_level: reward.level,
       coupon_percentage: 0,
-      coupon_code: reward?.couponCode || createRewardCode(achievementLevel),
+      coupon_code: reward.couponCode,
       coupon_earned: true,
       coupon_sent: false,
-      reward_name: rewardName,
+      reward_name: reward.rewardName,
     })
 
   if (error) {
-    console.error('Guest reward save error:', error)
+    console.error(
+      'Guest reward save error:',
+      error
+    )
 
-    if (submitButton) {
-      submitButton.disabled = false
-      submitButton.textContent =
-        'Save My Result and Reward'
-    }
+    submitButton.disabled = false
+    submitButton.textContent =
+      'Save My Result and Reward'
 
     showResultsError(
       message,
-      error?.message ||
-        'We could not save the reward. Please try again.'
+      'We could not save the reward. Please try again.'
     )
     return
   }
 
   sessionStorage.setItem('soraParentEmail', email)
   sessionStorage.setItem('soraPlayerMode', 'email')
-  sessionStorage.setItem(
-    'soraFinalResultSaved',
-    'true'
-  )
-  sessionStorage.setItem(
-    'soraCompletedQuests',
-    String(completedQuests)
-  )
 
   message.textContent =
     'Your result and reward were saved successfully! 🎉'
@@ -475,11 +445,9 @@ async function saveGuestReward({
   message.className =
     'results-message results-message-success'
 
-  const rewardForm =
-    document.querySelector('#reward-email-form')
-
-  if (rewardForm) {
-    rewardForm.innerHTML = `
+  document
+    .querySelector('#reward-email-form')
+    .innerHTML = `
       <div class="reward-claimed-message">
         <span>✅</span>
 
@@ -493,7 +461,6 @@ async function saveGuestReward({
         </div>
       </div>
     `
-  }
 }
 
 async function saveCompletedResult({
@@ -522,18 +489,6 @@ async function saveCompletedResult({
 
   message.className = 'results-message'
 
-  const achievementLevel =
-    completedQuests >= 3
-      ? 3
-      : completedQuests === 2
-        ? 2
-        : completedQuests === 1
-          ? 1
-          : 0
-
-  const rewardName =
-    getRewardNameFromCount(completedQuests)
-
   const { error } = await supabase
     .from('sora_adventure_results')
     .insert({
@@ -545,21 +500,23 @@ async function saveCompletedResult({
       activity3_score: activity3Score,
       total_score: totalScore,
       completed_quests: completedQuests,
-      achievement_level: achievementLevel,
+      achievement_level: reward.level,
       coupon_percentage: 0,
-      coupon_code: reward?.couponCode || createRewardCode(achievementLevel),
+      coupon_code: reward.couponCode,
       coupon_earned: true,
       coupon_sent: false,
-      reward_name: rewardName,
+      reward_name: reward.rewardName,
     })
 
   if (error) {
-    console.error('Completed result save error:', error)
+    console.error(
+      'Completed result save error:',
+      error
+    )
 
     showResultsError(
       message,
-      error?.message ||
-        'Your score is displayed, but it could not be saved.'
+      'Your score is displayed, but it could not be saved.'
     )
     return
   }
@@ -567,10 +524,6 @@ async function saveCompletedResult({
   sessionStorage.setItem(
     'soraFinalResultSaved',
     'true'
-  )
-  sessionStorage.setItem(
-    'soraCompletedQuests',
-    String(completedQuests)
   )
 
   message.textContent =
@@ -581,57 +534,21 @@ async function saveCompletedResult({
 }
 
 function getCompletedQuestCount() {
-  const storedCount = Number(
-    sessionStorage.getItem('soraCompletedQuests') || 0
-  )
-
-  if (storedCount > 0) {
-    return storedCount
-  }
-
-  const completedCount = [
-    sessionStorage.getItem('activity1Complete') === 'true' ||
-      Number(sessionStorage.getItem('activity1Score') || 0) > 0,
-    sessionStorage.getItem('activity2Complete') === 'true' ||
-      Number(sessionStorage.getItem('activity2Score') || 0) > 0,
-    sessionStorage.getItem('activity3Complete') === 'true' ||
-      Number(sessionStorage.getItem('activity3Score') || 0) > 0,
+  return [
+    sessionStorage.getItem('activity1Complete') === 'true',
+    sessionStorage.getItem('activity2Complete') === 'true',
+    sessionStorage.getItem('activity3Complete') === 'true',
   ].filter(Boolean).length
-
-  sessionStorage.setItem(
-    'soraCompletedQuests',
-    String(completedCount)
-  )
-
-  return completedCount
-}
-
-function getRewardNameFromCount(completedQuestCount) {
-  if (completedQuestCount >= 3) {
-    return '🎉 1 month of ASEP English Class'
-  }
-
-  if (completedQuestCount === 2) {
-    return '🎉 2 weeks of ASEP English Class'
-  }
-
-  if (completedQuestCount === 1) {
-    return '🎉 1 week of ASEP English Class'
-  }
-
-  return 'No reward yet'
 }
 
 function getReward(completedQuestCount) {
-  const rewardName = getRewardNameFromCount(completedQuestCount)
-
   if (completedQuestCount >= 3) {
     return {
       level: 3,
       title: 'SORA Star',
-      rewardName,
+      rewardName: 'First Month of ASEP Free',
       message:
-        'Amazing work! You reached the highest SORA Adventure level — celebration time! 🎉',
+        'Incredible work! You reached the highest SORA Adventure level.',
       couponCode: createRewardCode(3),
     }
   }
@@ -640,9 +557,9 @@ function getReward(completedQuestCount) {
     return {
       level: 2,
       title: 'Champion',
-      rewardName,
+      rewardName: 'Two Weeks of ASEP Free',
       message:
-        'Fantastic job! You completed a major milestone and earned a brilliant reward! 🎉',
+        'Excellent work! You completed a major milestone.',
       couponCode: createRewardCode(2),
     }
   }
@@ -651,9 +568,9 @@ function getReward(completedQuestCount) {
     return {
       level: 1,
       title: 'Explorer',
-      rewardName,
+      rewardName: 'One Week of ASEP Free',
       message:
-        'Wonderful effort! You unlocked your first amazing reward! 🎉',
+        'Great work! You completed the adventure and unlocked your first reward.',
       couponCode: createRewardCode(1),
     }
   }
@@ -689,8 +606,6 @@ function createRewardCode(level) {
 }
 
 function showResultsError(element, text) {
-  if (!element) return
-
   element.textContent = text
   element.className =
     'results-message results-message-error'
@@ -704,7 +619,6 @@ function clearAdventureSession() {
     'soraMarketingConsent',
     'soraFinalResultSaved',
     'soraRewardCode',
-    'soraCompletedQuests',
     'activity1Score',
     'activity2Score',
     'activity3Score',
@@ -894,7 +808,7 @@ function showShareWithFriendsModal({
       )
 
       const body = encodeURIComponent(
-        `Hi! I just completed the SORA Adventure and won ${rewardName} 🎉 I scored ${score} / 30 and completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.`
+        `Hi! I just completed the SORA Adventure. I earned ${rewardName} and scored ${score} / 30. I completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.`
       )
 
       window.location.href =

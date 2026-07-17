@@ -166,8 +166,7 @@ function loadRound() {
   document.querySelector('#soccer-progress-bar').style.width =
     `${(currentKick / TOTAL_KICKS) * 100}%`
 
-  document.querySelector('#soccer-coach-message').textContent =
-    `Drag the ball into the ${round.target} goal!`
+  document.querySelector('#soccer-coach-message').textContent = round.target
 
   document.querySelector('#soccer-feedback').textContent =
     'Drag the ball into a goal!'
@@ -500,9 +499,7 @@ function speakInstruction() {
     return
   }
 
-  speak(
-    `Drag the ball into the letter ${round.target} goal`
-  )
+  speak(round.target)
 }
 
 function speak(text) {

@@ -1,0 +1,33 @@
+export function getQuestReward(completedQuests) {
+  const count = Number(completedQuests || 0);
+
+  if (count >= 3) {
+    return {
+      label: 'First Month of ASEP Free',
+      tier: 3,
+      completedQuests: count,
+    };
+  }
+
+  if (count === 2) {
+    return {
+      label: 'Two Weeks of ASEP Free',
+      tier: 2,
+      completedQuests: count,
+    };
+  }
+
+  if (count === 1) {
+    return {
+      label: 'One Week of ASEP Free',
+      tier: 1,
+      completedQuests: count,
+    };
+  }
+
+  return {
+    label: 'No reward yet',
+    tier: 0,
+    completedQuests: count,
+  };
+}
