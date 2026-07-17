@@ -370,12 +370,7 @@ async function saveGuestReward({
   completedQuests,
   reward,
 }) {
-  const alreadySaved =
-    sessionStorage.getItem('soraFinalResultSaved') === 'true'
 
-  if (alreadySaved) {
-    return
-  }
 
   const message =
     document.querySelector('#results-message')
@@ -422,24 +417,28 @@ async function saveGuestReward({
   const rewardName =
     getRewardNameFromCount(completedQuests)
 
-  const { error } = await supabase
-    .from('sora_adventure_results')
-    .insert({
-      email,
-      player_mode: 'guest',
-      marketing_consent: marketingConsent,
-      activity1_score: activity1Score,
-      activity2_score: activity2Score,
-      activity3_score: activity3Score,
-      total_score: totalScore,
-      completed_quests: completedQuests,
-      achievement_level: achievementLevel,
-      coupon_percentage: 0,
-      coupon_code: reward?.couponCode || createRewardCode(achievementLevel),
-      coupon_earned: true,
-      coupon_sent: false,
-      reward_name: rewardName,
-    })
+const { error } = await supabase
+  .from('sora_adventure_results')
+  .upsert({
+    email,
+    player_mode: 'guest',
+    marketing_consent: marketingConsent,
+    activity1_score: activity1Score,
+    activity2_score: activity2Score,
+    activity3_score: activity3Score,
+    total_score: totalScore,
+    completed_quests: completedQuests,
+    achievement_level: achievementLevel,
+    coupon_percentage: 0,
+    coupon_code:
+      reward?.couponCode || createRewardCode(achievementLevel),
+    coupon_earned: true,
+    coupon_sent: false,
+    reward_name: rewardName,
+    submission_token: getSubmissionToken(),
+  }, {
+    onConflict: 'submission_token',
+  })
 
   if (error) {
     console.error('Guest reward save error:', error)
@@ -507,12 +506,7 @@ async function saveCompletedResult({
   completedQuests,
   reward,
 }) {
-  const alreadySaved =
-    sessionStorage.getItem('soraFinalResultSaved') === 'true'
 
-  if (alreadySaved) {
-    return
-  }
 
   const message =
     document.querySelector('#results-message')
@@ -534,24 +528,28 @@ async function saveCompletedResult({
   const rewardName =
     getRewardNameFromCount(completedQuests)
 
-  const { error } = await supabase
-    .from('sora_adventure_results')
-    .insert({
-      email,
-      player_mode: playerMode,
-      marketing_consent: marketingConsent,
-      activity1_score: activity1Score,
-      activity2_score: activity2Score,
-      activity3_score: activity3Score,
-      total_score: totalScore,
-      completed_quests: completedQuests,
-      achievement_level: achievementLevel,
-      coupon_percentage: 0,
-      coupon_code: reward?.couponCode || createRewardCode(achievementLevel),
-      coupon_earned: true,
-      coupon_sent: false,
-      reward_name: rewardName,
-    })
+const { error } = await supabase
+  .from('sora_adventure_results')
+  .upsert({
+    email,
+    player_mode: playerMode,
+    marketing_consent: marketingConsent,
+    activity1_score: activity1Score,
+    activity2_score: activity2Score,
+    activity3_score: activity3Score,
+    total_score: totalScore,
+    completed_quests: completedQuests,
+    achievement_level: achievementLevel,
+    coupon_percentage: 0,
+    coupon_code:
+      reward?.couponCode || createRewardCode(achievementLevel),
+    coupon_earned: true,
+    coupon_sent: false,
+    reward_name: rewardName,
+    submission_token: getSubmissionToken(),
+  }, {
+    onConflict: 'submission_token',
+  })
 
   if (error) {
     console.error('Completed result save error:', error)
@@ -581,19 +579,13 @@ async function saveCompletedResult({
 }
 
 function getCompletedQuestCount() {
-  const storedCount = Number(
-    sessionStorage.getItem('soraCompletedQuests') || 0
-  )
-
-  if (storedCount > 0) {
-    return storedCount
-  }
-
   const completedCount = [
     sessionStorage.getItem('activity1Complete') === 'true' ||
       Number(sessionStorage.getItem('activity1Score') || 0) > 0,
+
     sessionStorage.getItem('activity2Complete') === 'true' ||
       Number(sessionStorage.getItem('activity2Score') || 0) > 0,
+
     sessionStorage.getItem('activity3Complete') === 'true' ||
       Number(sessionStorage.getItem('activity3Score') || 0) > 0,
   ].filter(Boolean).length
@@ -668,6 +660,17 @@ function getReward(completedQuestCount) {
   }
 }
 
+function getSubmissionToken() {
+  let token = sessionStorage.getItem('soraSubmissionToken')
+
+  if (!token) {
+    token = crypto.randomUUID()
+    sessionStorage.setItem('soraSubmissionToken', token)
+  }
+
+  return token
+}
+
 function createRewardCode(level) {
   const savedCode =
     sessionStorage.getItem('soraRewardCode')
@@ -687,7 +690,6 @@ function createRewardCode(level) {
 
   return code
 }
-
 function showResultsError(element, text) {
   if (!element) return
 
@@ -697,21 +699,22 @@ function showResultsError(element, text) {
 }
 
 function clearAdventureSession() {
-  const keys = [
-    'soraPlayerMode',
-    'soraParentEmail',
-    'soraResultConsent',
-    'soraMarketingConsent',
-    'soraFinalResultSaved',
-    'soraRewardCode',
-    'soraCompletedQuests',
-    'activity1Score',
-    'activity2Score',
-    'activity3Score',
-    'activity1Complete',
-    'activity2Complete',
-    'activity3Complete',
-  ]
+const keys = [
+  'soraPlayerMode',
+  'soraParentEmail',
+  'soraResultConsent',
+  'soraMarketingConsent',
+  'soraFinalResultSaved',
+  'soraRewardCode',
+  'soraSubmissionToken',
+  'soraCompletedQuests',
+  'activity1Score',
+  'activity2Score',
+  'activity3Score',
+  'activity1Complete',
+  'activity2Complete',
+  'activity3Complete',
+]
 
   keys.forEach((key) => {
     sessionStorage.removeItem(key)
