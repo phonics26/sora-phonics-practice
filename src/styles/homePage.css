@@ -230,6 +230,10 @@
 
 .quest-map {
   margin-top: 19px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .quest-card {
