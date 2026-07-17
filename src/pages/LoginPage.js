@@ -37,15 +37,15 @@ export function renderLoginPage() {
 <section class="achievement-preview">
 
   <article class="achievement-level quest-preview-card quest-preview-one">
-      <div class="quest-picture soccer-picture">
+<div class="quest-preview-picture soccer-preview">
 
-        <div class="mini-goal">🥅</div>
+    <div class="preview-goal">🥅</div>
 
-        <div class="mini-ball">⚽</div>
+    <div class="preview-ball">⚽</div>
 
-        <div class="mini-letter">A</div>
+    <div class="preview-letter">A</div>
 
-      </div>
+</div>
 
     <div class="quest-preview-content">
       <p>QUEST 1</p>
