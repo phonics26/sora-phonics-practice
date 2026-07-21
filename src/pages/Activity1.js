@@ -614,14 +614,14 @@ function finishActivity() {
           id="soccer-return-home"
           type="button"
         >
-          Return to Home
+          🔓 Unlock Animal Match
         </button>
 
         <button
           id="soccer-play-again"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>

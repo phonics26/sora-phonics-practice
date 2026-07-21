@@ -382,7 +382,7 @@ function finishActivity() {
           class="animal-primary-button"
           type="button"
         >
-          Return to Home
+          🔓 Unlock Word Builder
         </button>
 
         <button
@@ -390,7 +390,7 @@ function finishActivity() {
           class="animal-secondary-button"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>

@@ -271,8 +271,8 @@ function renderActivityTwo({ complete, score, unlocked }) {
 
         <span>
           ${unlocked
-            ? 'Ready to begin!'
-            : 'Complete Quest 1 to unlock this quest'}
+            ? '🔓 Unlocked — ready to begin!'
+            : '🔒 Complete Quest 1 to unlock this quest'}
         </span>
 
         ${
@@ -284,7 +284,7 @@ function renderActivityTwo({ complete, score, unlocked }) {
             `
             : `
               <div class="quest-ready">
-                ${unlocked ? 'Ready to begin!' : 'Locked'}
+                ${unlocked ? '🔓 Unlocked' : '🔒 Locked'}
               </div>
             `
         }
@@ -292,7 +292,7 @@ function renderActivityTwo({ complete, score, unlocked }) {
 
       <div class="quest-actions">
         <button id="activity-two-button" class="quest-play-button ${unlocked ? '' : 'locked'}" type="button" ${unlocked ? '' : 'disabled'}>
-          ${unlocked ? (complete ? '🎁 Open Your Reward' : 'Start Quest') : 'Locked'}
+          ${unlocked ? (complete ? '🎁 Open Your Reward' : '▶️ Start Quest') : '🔒 Locked'}
         </button>
         ${complete ? `<button id="activity-two-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>` : ''}
       </div>
@@ -325,8 +325,8 @@ function renderActivityThree({ complete, score, unlocked }) {
 
         <span>
           ${unlocked
-            ? 'Ready to begin!'
-            : 'Complete Quest 2 to unlock this quest'}
+            ? '🔓 Unlocked — ready to begin!'
+            : '🔒 Complete Quest 2 to unlock this quest'}
         </span>
 
         ${
@@ -338,7 +338,7 @@ function renderActivityThree({ complete, score, unlocked }) {
             `
             : `
               <div class="quest-ready">
-                ${unlocked ? 'Ready to begin!' : 'Locked'}
+                ${unlocked ? '🔓 Unlocked' : '🔒 Locked'}
               </div>
             `
         }
@@ -346,7 +346,7 @@ function renderActivityThree({ complete, score, unlocked }) {
 
       <div class="quest-actions">
         <button id="activity-three-button" class="quest-play-button ${unlocked ? '' : 'locked'}" type="button" ${unlocked ? '' : 'disabled'}>
-          ${unlocked ? (complete ? '🎁 Open Your Reward' : 'Start Quest') : 'Locked'}
+          ${unlocked ? (complete ? '🎁 Open Your Reward' : '▶️ Start Quest') : '🔒 Locked'}
         </button>
         ${complete ? `<button id="activity-three-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>` : ''}
       </div>

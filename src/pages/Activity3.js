@@ -668,7 +668,7 @@ function finishActivity() {
           class="cvc-primary-button"
           type="button"
         >
-          View Results
+          🎁 View My Rewards
         </button>
 
         <button
@@ -676,7 +676,7 @@ function finishActivity() {
           class="cvc-secondary-button"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>
