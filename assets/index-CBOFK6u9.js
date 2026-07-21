@@ -133,14 +133,14 @@
           id="soccer-return-home"
           type="button"
         >
-          Return to Home
+          🔓 Unlock Animal Match
         </button>
 
         <button
           id="soccer-play-again"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>
@@ -264,7 +264,7 @@
           class="animal-primary-button"
           type="button"
         >
-          Return to Home
+          🔓 Unlock Word Builder
         </button>
 
         <button
@@ -272,7 +272,7 @@
           class="animal-secondary-button"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>
@@ -420,7 +420,7 @@
           class="cvc-primary-button"
           type="button"
         >
-          View Results
+          🎁 View My Rewards
         </button>
 
         <button
@@ -428,7 +428,7 @@
           class="cvc-secondary-button"
           type="button"
         >
-          Play Again
+          🔄 Play Again
         </button>
       </section>
     </main>
@@ -980,7 +980,7 @@ Good luck on your adventure! 🌟`);window.location.href=`mailto:${o}?subject=${
         <h2>Animal Sound Safari</h2>
 
         <span>
-          ${r?"Ready to begin!":"Complete Quest 1 to unlock this quest"}
+          ${r?"🔓 Unlocked — ready to begin!":"🔒 Complete Quest 1 to unlock this quest"}
         </span>
 
         ${t?`
@@ -989,14 +989,14 @@ Good luck on your adventure! 🌟`);window.location.href=`mailto:${o}?subject=${
               </div>
             `:`
               <div class="quest-ready">
-                ${r?"Ready to begin!":"Locked"}
+                ${r?"🔓 Unlocked":"🔒 Locked"}
               </div>
             `}
       </div>
 
       <div class="quest-actions">
         <button id="activity-two-button" class="quest-play-button ${r?"":"locked"}" type="button" ${r?"":"disabled"}>
-          ${r?t?"🎁 Open Your Reward":"Start Quest":"Locked"}
+          ${r?t?"🎁 Open Your Reward":"▶️ Start Quest":"🔒 Locked"}
         </button>
         ${t?'<button id="activity-two-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>':""}
       </div>
@@ -1024,7 +1024,7 @@ Good luck on your adventure! 🌟`);window.location.href=`mailto:${o}?subject=${
         <h2>Word Magic Builder</h2>
 
         <span>
-          ${r?"Ready to begin!":"Complete Quest 2 to unlock this quest"}
+          ${r?"🔓 Unlocked — ready to begin!":"🔒 Complete Quest 2 to unlock this quest"}
         </span>
 
         ${t?`
@@ -1033,14 +1033,14 @@ Good luck on your adventure! 🌟`);window.location.href=`mailto:${o}?subject=${
               </div>
             `:`
               <div class="quest-ready">
-                ${r?"Ready to begin!":"Locked"}
+                ${r?"🔓 Unlocked":"🔒 Locked"}
               </div>
             `}
       </div>
 
       <div class="quest-actions">
         <button id="activity-three-button" class="quest-play-button ${r?"":"locked"}" type="button" ${r?"":"disabled"}>
-          ${r?t?"🎁 Open Your Reward":"Start Quest":"Locked"}
+          ${r?t?"🎁 Open Your Reward":"▶️ Start Quest":"🔒 Locked"}
         </button>
         ${t?'<button id="activity-three-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>':""}
       </div>
