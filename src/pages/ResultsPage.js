@@ -7,6 +7,9 @@ const mascotPath =
 
 const COUPON_EXPIRY_DATE = '2026-10-31'
 const COUPON_EXPIRY_LABEL = 'October 31, 2026'
+const SORA_ADVENTURE_URL =
+  'https://phonics26.github.io/sora-phonics-practice/'
+const SORA_WEBSITE_URL = 'https://sora.business/'
 
 export function renderResultsPage() {
   const activity1Score = Number(
@@ -907,11 +910,8 @@ function showShareWithFriendsModal({
         '👫 Try the SORA Adventure and win a free ASEP class!'
       )
 
-      const questLink =
-        `${window.location.origin}${window.location.pathname}`
-
       const body = encodeURIComponent(
-        `👫 Hi, friend!\n\nI just completed the SORA Adventure and earned ${rewardName}! 🎉 I scored ${score}/30 and completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.\n\nYou can play the fun English quests too for an opportunity to win a free ASEP class:\n${questLink}\n\nLearn more about SORA and its English programs:\nhttps://sora.business/\n\nGood luck on your adventure! 🌟`
+        `👫 Hi, friend!\n\nI just completed the SORA Adventure and earned ${rewardName}! 🎉 I scored ${score}/30 and completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.\n\nYou can play the fun English quests too for an opportunity to win a free ASEP class:\n${SORA_ADVENTURE_URL}\n\nLearn more about SORA and its English programs:\n${SORA_WEBSITE_URL}\n\nGood luck on your adventure! 🌟`
       )
 
       window.location.href =
