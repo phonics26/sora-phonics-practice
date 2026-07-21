@@ -38,9 +38,7 @@
           />
 
           <div class="soccer-speech-bubble">
-            <p id="soccer-coach-message">
-              Drag the ball into the correct goal!
-            </p>
+            <p id="soccer-coach-message"></p>
           </div>
         </section>
 
@@ -66,10 +64,6 @@
           class="soccer-goals"
           aria-label="Letter goals"
         ></section>
-
-        <p class="soccer-drag-instruction">
-          Touch and drag the ball into the correct goal.
-        </p>
 
         <div class="soccer-ball-area">
           <img
