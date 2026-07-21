@@ -85,6 +85,7 @@ let dragClone = null
 let originalRectangle = null
 let pointerOffsetX = 0
 let pointerOffsetY = 0
+let currentSentenceAudio = null
 
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
@@ -588,39 +589,37 @@ function speakMissingSentence() {
     return
   }
 
-  const sentence =
-    `${round.sentenceStart}, blank, ${round.sentenceEnd}`
-
-  speak(sentence)
+  playSentenceRecording(round.target, 'prompt')
 }
 
 function speakCompletedSentence(round) {
-  const sentence =
-    `${round.sentenceStart} ${round.target} ${round.sentenceEnd}`
-
-  speak(sentence)
+  playSentenceRecording(round.target, 'complete')
 }
 
-function speak(text) {
-  if (!('speechSynthesis' in window)) {
-    return
-  }
+function playSentenceRecording(target, version) {
+  cancelSpeech()
 
-  window.speechSynthesis.cancel()
+  const recordingPath =
+    `${import.meta.env.BASE_URL}audio/sentences/${target}-${version}.wav`
 
-  const speech =
-    new SpeechSynthesisUtterance(text)
+  currentSentenceAudio = new Audio(recordingPath)
+  currentSentenceAudio.preload = 'auto'
+  currentSentenceAudio.volume = 1
 
-  speech.rate = 0.78
-  speech.pitch = 1.03
-  speech.volume = 1
+  currentSentenceAudio.addEventListener('ended', () => {
+    currentSentenceAudio = null
+  }, { once: true })
 
-  window.speechSynthesis.speak(speech)
+  currentSentenceAudio.play().catch(() => {
+    currentSentenceAudio = null
+  })
 }
 
 function cancelSpeech() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
+  if (currentSentenceAudio) {
+    currentSentenceAudio.pause()
+    currentSentenceAudio.currentTime = 0
+    currentSentenceAudio = null
   }
 }
 

@@ -69,18 +69,18 @@ const rounds = [
     ],
   },
   {
-    target: 'hen',
+    target: 'bird',
     choices: [
       { name: 'dog', icon: '🐶' },
-      { name: 'hen', icon: '🐔' },
+      { name: 'bird', icon: '🐦' },
       { name: 'cat', icon: '🐱' },
     ],
   },
   {
-    target: 'fox',
+    target: 'rabbit',
     choices: [
       { name: 'frog', icon: '🐸' },
-      { name: 'fox', icon: '🦊' },
+      { name: 'pig', icon: '🐷' },
       { name: 'rabbit', icon: '🐰' },
     ],
   },
@@ -89,6 +89,7 @@ const rounds = [
 let currentRound = 0
 let score = 0
 let acceptingAnswer = true
+let currentAnimalAudio = null
 
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
@@ -186,7 +187,7 @@ function renderGame() {
   document
     .querySelector('#animal-home-button')
     .addEventListener('click', () => {
-      window.speechSynthesis?.cancel()
+      stopAnimalAudio()
       navigate('home')
     })
 
@@ -254,23 +255,32 @@ function speakInstruction() {
     return
   }
 
-  if (!('speechSynthesis' in window)) {
-    document.querySelector('#animal-feedback').textContent =
-      `Point to the ${round.target}.`
+  stopAnimalAudio()
+
+  const recordingPath =
+    `${import.meta.env.BASE_URL}audio/animals/${round.target}.wav`
+
+  currentAnimalAudio = new Audio(recordingPath)
+  currentAnimalAudio.preload = 'auto'
+  currentAnimalAudio.volume = 1
+
+  currentAnimalAudio.addEventListener('ended', () => {
+    currentAnimalAudio = null
+  }, { once: true })
+
+  currentAnimalAudio.play().catch(() => {
+    currentAnimalAudio = null
+  })
+}
+
+function stopAnimalAudio() {
+  if (!currentAnimalAudio) {
     return
   }
 
-  window.speechSynthesis.cancel()
-
-  const speech = new SpeechSynthesisUtterance(
-    `Point to the ${round.target}`
-  )
-
-  speech.rate = 0.82
-  speech.pitch = 1.05
-  speech.volume = 1
-
-  window.speechSynthesis.speak(speech)
+  currentAnimalAudio.pause()
+  currentAnimalAudio.currentTime = 0
+  currentAnimalAudio = null
 }
 
 function checkAnswer(button) {
@@ -328,7 +338,7 @@ function checkAnswer(button) {
 }
 
 function finishActivity() {
-  window.speechSynthesis?.cancel()
+  stopAnimalAudio()
 
   sessionStorage.setItem(
     'activity2Score',

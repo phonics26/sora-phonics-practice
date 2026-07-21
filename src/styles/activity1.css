@@ -1101,6 +1101,48 @@ body {
   pointer-events: auto;
 }
 
+.soccer-field-mascot {
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - clamp(130px, 25vw, 190px));
+  bottom: -3px;
+
+  width: clamp(90px, 23vw, 145px);
+  height: auto;
+
+  pointer-events: none;
+  user-select: none;
+
+  filter: drop-shadow(0 11px 9px rgba(20, 13, 45, 0.3));
+  transform-origin: 85% 75%;
+}
+
+.soccer-field-mascot-kick {
+  animation: soccer-field-mascot-kick 700ms ease-out;
+}
+
+@keyframes soccer-field-mascot-kick {
+  0% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+
+  32% {
+    transform: translateX(17px) rotate(8deg) scale(1.05);
+  }
+
+  52% {
+    transform: translateX(30px) rotate(13deg) scale(1.08);
+  }
+
+  78% {
+    transform: translateX(12px) rotate(-5deg) scale(1.04);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+
 .soccer-ball:not(.soccer-ball-clone) {
   position: relative;
   left: auto;
@@ -1146,4 +1188,11 @@ body {
 
   transform: scale(0.55) rotate(540deg);
   opacity: 0.25;
+}
+
+@media (max-width: 420px) {
+  .soccer-field-mascot {
+    left: calc(50% - 118px);
+    width: 92px;
+  }
 }

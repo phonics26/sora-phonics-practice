@@ -4,16 +4,16 @@ import { navigate } from '../router.js'
 const TOTAL_KICKS = 10
 
 const rounds = [
-  { target: 'A', goals: ['A', 'C', 'D'] },
-  { target: 'B', goals: ['E', 'B', 'C'] },
-  { target: 'C', goals: ['D', 'A', 'C'] },
-  { target: 'D', goals: ['B', 'D', 'E'] },
-  { target: 'E', goals: ['E', 'C', 'A'] },
-  { target: 'A', goals: ['D', 'A', 'B'] },
-  { target: 'C', goals: ['C', 'E', 'B'] },
-  { target: 'B', goals: ['A', 'D', 'B'] },
-  { target: 'E', goals: ['C', 'E', 'D'] },
-  { target: 'D', goals: ['B', 'A', 'D'] },
+  { target: 'A', goals: ['A', 'C', 'F'] },
+  { target: 'B', goals: ['E', 'B', 'G'] },
+  { target: 'C', goals: ['F', 'A', 'C'] },
+  { target: 'D', goals: ['B', 'D', 'G'] },
+  { target: 'E', goals: ['E', 'C', 'F'] },
+  { target: 'F', goals: ['D', 'F', 'B'] },
+  { target: 'G', goals: ['G', 'E', 'C'] },
+  { target: 'A', goals: ['G', 'D', 'A'] },
+  { target: 'C', goals: ['B', 'C', 'E'] },
+  { target: 'G', goals: ['F', 'A', 'G'] },
 ]
 
 let currentKick = 0
@@ -25,9 +25,11 @@ let dragClone = null
 let originalBallRect = null
 let pointerOffsetX = 0
 let pointerOffsetY = 0
+let currentLetterAudio = null
+let currentGoalAudio = null
 
 const mascotPath =
-  `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
+  `${import.meta.env.BASE_URL}mascot/cloud_football_hat.png`
 
 export function renderActivity1() {
   currentKick = 0
@@ -113,6 +115,13 @@ function renderGameScreen() {
         </p>
 
         <div class="soccer-ball-area">
+          <img
+            id="soccer-field-mascot"
+            class="soccer-field-mascot"
+            src="${mascotPath}"
+            alt="SORA getting ready to kick the ball"
+          />
+
           <button
             id="soccer-ball"
             class="soccer-ball"
@@ -323,13 +332,19 @@ function checkDroppedGoal(goal) {
   const mascot =
     document.querySelector('#soccer-mascot')
 
+  const fieldMascot =
+    document.querySelector('#soccer-field-mascot')
+
   if (selectedLetter === round.target) {
     acceptingAnswer = false
     score += 1
 
     moveCloneIntoGoal(goal)
+    playGoalSound()
+    playAmazingGoalRecording()
     goal.classList.add('soccer-correct-goal')
     mascot.classList.add('soccer-mascot-celebrate')
+    fieldMascot?.classList.add('soccer-field-mascot-kick')
 
     feedback.textContent =
       'GOAL! Fantastic! +1 ⭐'
@@ -345,6 +360,9 @@ function checkDroppedGoal(goal) {
     window.setTimeout(() => {
       mascot.classList.remove(
         'soccer-mascot-celebrate'
+      )
+      fieldMascot?.classList.remove(
+        'soccer-field-mascot-kick'
       )
 
       currentKick += 1
@@ -499,29 +517,61 @@ function speakInstruction() {
     return
   }
 
-  speak(round.target)
+  playLetterRecording(round.target)
 }
 
-function speak(text) {
-  if (!('speechSynthesis' in window)) {
-    return
+function playLetterRecording(letter) {
+  cancelSpeech()
+
+  const recordingPath =
+    `${import.meta.env.BASE_URL}audio/letters/${letter}.wav`
+
+  currentLetterAudio = new Audio(recordingPath)
+  currentLetterAudio.preload = 'auto'
+  currentLetterAudio.volume = 1
+
+  currentLetterAudio.addEventListener('ended', () => {
+    currentLetterAudio = null
+  }, { once: true })
+
+  currentLetterAudio.play().catch(() => {
+    currentLetterAudio = null
+  })
+}
+
+function playAmazingGoalRecording() {
+  if (currentGoalAudio) {
+    currentGoalAudio.pause()
+    currentGoalAudio.currentTime = 0
   }
 
-  window.speechSynthesis.cancel()
+  const recordingPath =
+    `${import.meta.env.BASE_URL}audio/effects/amazing-goal.wav`
 
-  const speech =
-    new SpeechSynthesisUtterance(text)
+  currentGoalAudio = new Audio(recordingPath)
+  currentGoalAudio.preload = 'auto'
+  currentGoalAudio.volume = 1
 
-  speech.rate = 0.82
-  speech.pitch = 1.05
-  speech.volume = 1
+  currentGoalAudio.addEventListener('ended', () => {
+    currentGoalAudio = null
+  }, { once: true })
 
-  window.speechSynthesis.speak(speech)
+  currentGoalAudio.play().catch(() => {
+    currentGoalAudio = null
+  })
 }
 
 function cancelSpeech() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
+  if (currentLetterAudio) {
+    currentLetterAudio.pause()
+    currentLetterAudio.currentTime = 0
+    currentLetterAudio = null
+  }
+
+  if (currentGoalAudio) {
+    currentGoalAudio.pause()
+    currentGoalAudio.currentTime = 0
+    currentGoalAudio = null
   }
 }
 
@@ -595,4 +645,58 @@ function finishActivity() {
       'click',
       renderActivity1
     )
+}
+
+function playGoalSound() {
+  const AudioContextClass =
+    window.AudioContext || window.webkitAudioContext
+
+  if (!AudioContextClass) {
+    return
+  }
+
+  const audioContext = new AudioContextClass()
+  const masterGain = audioContext.createGain()
+  const startTime = audioContext.currentTime
+
+  masterGain.gain.setValueAtTime(0.0001, startTime)
+  masterGain.gain.exponentialRampToValueAtTime(
+    0.22,
+    startTime + 0.025
+  )
+  masterGain.gain.exponentialRampToValueAtTime(
+    0.0001,
+    startTime + 0.72
+  )
+  masterGain.connect(audioContext.destination)
+
+  const notes = [523.25, 659.25, 783.99, 1046.5]
+
+  notes.forEach((frequency, index) => {
+    const oscillator = audioContext.createOscillator()
+    const noteGain = audioContext.createGain()
+    const noteStart = startTime + index * 0.1
+
+    oscillator.type = index === 3 ? 'sine' : 'triangle'
+    oscillator.frequency.setValueAtTime(frequency, noteStart)
+
+    noteGain.gain.setValueAtTime(0.0001, noteStart)
+    noteGain.gain.exponentialRampToValueAtTime(
+      0.75,
+      noteStart + 0.018
+    )
+    noteGain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      noteStart + 0.3
+    )
+
+    oscillator.connect(noteGain)
+    noteGain.connect(masterGain)
+    oscillator.start(noteStart)
+    oscillator.stop(noteStart + 0.32)
+  })
+
+  window.setTimeout(() => {
+    audioContext.close().catch(() => {})
+  }, 900)
 }

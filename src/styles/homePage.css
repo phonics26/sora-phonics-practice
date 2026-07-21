@@ -505,6 +505,39 @@
     0 10px 18px rgba(118, 87, 233, 0.25);
 }
 
+.quest-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 145px;
+}
+
+.quest-replay-button {
+  min-height: 43px;
+  padding: 0 14px;
+
+  border: 2px solid #7657e9;
+  border-radius: 15px;
+
+  color: #6142ce;
+  background: rgba(255, 255, 255, 0.82);
+
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.quest-play-button,
+.quest-replay-button {
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+
+.quest-play-button:hover,
+.quest-replay-button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
 .quest-lock {
   display: grid;
   place-items: center;
@@ -733,10 +766,15 @@
       38px 100px minmax(0, 1fr);
   }
 
-  .quest-play-button,
+  .quest-actions,
   .quest-lock {
     grid-column: 2 / 4;
 
+    width: 100%;
+  }
+
+  .quest-actions .quest-play-button,
+  .quest-actions .quest-replay-button {
     width: 100%;
   }
 

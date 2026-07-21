@@ -192,18 +192,14 @@ export function renderHomePage() {
             `
         }
 
-        <button
-          id="return-login-button"
-          class="return-login-button"
-          type="button"
-        >
-          Return to Parent Entry
-        </button>
       </section>
     </main>
   `
 
   addButtonListeners({
+    activity1Complete,
+    activity2Complete,
+    activity3Complete,
     quest2Unlocked,
     quest3Unlocked,
   })
@@ -245,13 +241,12 @@ function renderActivityOne({ complete, score }) {
         }
       </div>
 
-      <button
-        id="activity-one-button"
-        class="quest-play-button"
-        type="button"
-      >
-        ${complete ? 'Claim Reward' : 'Start Quest'}
-      </button>
+      <div class="quest-actions">
+        <button id="activity-one-button" class="quest-play-button" type="button">
+          ${complete ? '🎁 Open Your Reward' : 'Start Quest'}
+        </button>
+        ${complete ? `<button id="activity-one-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>` : ''}
+      </div>
     </article>
   `
 }
@@ -295,14 +290,12 @@ function renderActivityTwo({ complete, score, unlocked }) {
         }
       </div>
 
-      <button
-        id="activity-two-button"
-        class="quest-play-button ${unlocked ? '' : 'locked'}"
-        type="button"
-        ${unlocked ? '' : 'disabled'}
-      >
-        ${unlocked ? (complete ? 'Claim Reward' : 'Start Quest') : 'Locked'}
-      </button>
+      <div class="quest-actions">
+        <button id="activity-two-button" class="quest-play-button ${unlocked ? '' : 'locked'}" type="button" ${unlocked ? '' : 'disabled'}>
+          ${unlocked ? (complete ? '🎁 Open Your Reward' : 'Start Quest') : 'Locked'}
+        </button>
+        ${complete ? `<button id="activity-two-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>` : ''}
+      </div>
     </article>
   `
 }
@@ -351,23 +344,27 @@ function renderActivityThree({ complete, score, unlocked }) {
         }
       </div>
 
-      <button
-        id="activity-three-button"
-        class="quest-play-button ${unlocked ? '' : 'locked'}"
-        type="button"
-        ${unlocked ? '' : 'disabled'}
-      >
-        ${unlocked ? (complete ? 'Claim Reward' : 'Start Quest') : 'Locked'}
-      </button>
+      <div class="quest-actions">
+        <button id="activity-three-button" class="quest-play-button ${unlocked ? '' : 'locked'}" type="button" ${unlocked ? '' : 'disabled'}>
+          ${unlocked ? (complete ? '🎁 Open Your Reward' : 'Start Quest') : 'Locked'}
+        </button>
+        ${complete ? `<button id="activity-three-replay-button" class="quest-replay-button" type="button">🔄 Play Again</button>` : ''}
+      </div>
     </article>
   `
 }
 
-function addButtonListeners({ quest2Unlocked, quest3Unlocked }) {
+function addButtonListeners({
+  activity1Complete,
+  activity2Complete,
+  activity3Complete,
+  quest2Unlocked,
+  quest3Unlocked,
+}) {
   document
     .querySelector('#activity-one-button')
     ?.addEventListener('click', () => {
-      navigate('activity1')
+      navigate(activity1Complete ? 'results' : 'activity1')
     })
 
   document
@@ -377,7 +374,7 @@ function addButtonListeners({ quest2Unlocked, quest3Unlocked }) {
         return
       }
 
-      navigate('activity2')
+      navigate(activity2Complete ? 'results' : 'activity2')
     })
 
   document
@@ -387,8 +384,20 @@ function addButtonListeners({ quest2Unlocked, quest3Unlocked }) {
         return
       }
 
-      navigate('activity3')
+      navigate(activity3Complete ? 'results' : 'activity3')
     })
+
+  document
+    .querySelector('#activity-one-replay-button')
+    ?.addEventListener('click', () => navigate('activity1'))
+
+  document
+    .querySelector('#activity-two-replay-button')
+    ?.addEventListener('click', () => navigate('activity2'))
+
+  document
+    .querySelector('#activity-three-replay-button')
+    ?.addEventListener('click', () => navigate('activity3'))
 
   const resultsButton =
     document.querySelector('#view-results-button')
@@ -399,11 +408,6 @@ function addButtonListeners({ quest2Unlocked, quest3Unlocked }) {
     })
   }
 
-  document
-    .querySelector('#return-login-button')
-    ?.addEventListener('click', () => {
-      navigate('login')
-    })
 }
 
 function getScore(key) {

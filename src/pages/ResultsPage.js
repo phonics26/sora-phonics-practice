@@ -38,14 +38,6 @@ export function renderResultsPage() {
   document.querySelector('#app').innerHTML = `
     <main class="results-page">
       <section class="results-window">
-        <div class="results-confetti" aria-hidden="true">
-          <span>⭐</span>
-          <span>✨</span>
-          <span>🎉</span>
-          <span>⭐</span>
-          <span>✨</span>
-        </div>
-
         <img
           class="results-mascot"
           src="${mascotPath}"
@@ -68,6 +60,14 @@ export function renderResultsPage() {
         >
           🏅 <strong>${completedQuestCount}/3 quests completed</strong>
         </p>
+
+        <div class="results-star-medal" aria-hidden="true">
+          <span class="results-medal-ribbon results-medal-ribbon-left"></span>
+          <span class="results-medal-ribbon results-medal-ribbon-right"></span>
+          <div class="results-medal-face">
+            <span>★</span>
+          </div>
+        </div>
 
         <section class="results-score-card">
           <span>Your total score</span>
@@ -178,7 +178,8 @@ export function renderResultsPage() {
           class="results-home-button"
           type="button"
         >
-          Return to Home
+          <span class="results-button-icon" aria-hidden="true">🏠</span>
+          <span>Return to Home</span>
         </button>
 
         <button
@@ -186,7 +187,8 @@ export function renderResultsPage() {
           class="share-game-button"
           type="button"
         >
-          📤 Share with Friends
+          <span class="results-button-icon" aria-hidden="true">👫</span>
+          <span>Share with Friends</span>
         </button>
 
         <button
@@ -194,7 +196,8 @@ export function renderResultsPage() {
           class="results-restart-button"
           type="button"
         >
-          Start a New Adventure
+          <span class="results-button-icon" aria-hidden="true">🚀</span>
+          <span>Start a New Adventure</span>
         </button>
 
         <p
@@ -259,7 +262,7 @@ export function renderResultsPage() {
     .querySelector('#results-restart-button')
     ?.addEventListener('click', () => {
       clearAdventureSession()
-      navigate('login')
+      navigate('home')
     })
 
   attachShareButtonHandler(
@@ -304,8 +307,8 @@ function renderGuestEmailForm() {
       </div>
 
       <p class="reward-email-description">
-        Enter a parent or guardian email so SORA can
-        contact you about your result and reward.
+        Enter your email to receive your coupon and more
+        information about the free ASEP class.
       </p>
 
       <label for="reward-parent-email">
@@ -782,7 +785,7 @@ function showShareWithFriendsModal({
       font-family:Arial, sans-serif;
     ">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
-        <h3 style="margin:0;color:#111827;">Share with a friend</h3>
+        <h3 style="margin:0;color:#111827;">👫 Invite a Friend to SORA</h3>
         <button
           id="share-friends-close"
           type="button"
@@ -799,7 +802,7 @@ function showShareWithFriendsModal({
       </div>
 
       <p style="margin:0 0 0.8rem;color:#4b5563;line-height:1.4;">
-        Enter your friend's email address and we’ll open your mail app with a pre-written message.
+        Invite a friend to play the English quests and have an opportunity to win a free ASEP class. We’ll open your email app with the invitation ready to send.
       </p>
 
       <label
@@ -853,7 +856,7 @@ function showShareWithFriendsModal({
             font-weight:600;
           "
         >
-          Send
+          ✉️ Send Invitation
         </button>
       </div>
     </div>
@@ -893,11 +896,14 @@ function showShareWithFriendsModal({
       }
 
       const subject = encodeURIComponent(
-        'Check out my SORA Adventure result'
+        '👫 Try the SORA Adventure and win a free ASEP class!'
       )
 
+      const questLink =
+        `${window.location.origin}${window.location.pathname}`
+
       const body = encodeURIComponent(
-        `Hi! I just completed the SORA Adventure and won ${rewardName} 🎉 I scored ${score} / 30 and completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.`
+        `👫 Hi, friend!\n\nI just completed the SORA Adventure and earned ${rewardName}! 🎉 I scored ${score}/30 and completed ${completedQuests} quest${completedQuests === 1 ? '' : 's'}.\n\nYou can play the fun English quests too for an opportunity to win a free ASEP class:\n${questLink}\n\nLearn more about SORA and its English programs:\nhttps://sora.business/\n\nGood luck on your adventure! 🌟`
       )
 
       window.location.href =
