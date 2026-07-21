@@ -673,6 +673,15 @@
   letter-spacing: 1px;
 }
 
+.reward-code-card .reward-expiry-date {
+  margin-top: 8px;
+
+  color: #6d5a76;
+
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .reward-claim-area {
   animation:
     reward-claim-entrance 600ms ease;

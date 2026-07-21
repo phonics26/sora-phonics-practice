@@ -5,6 +5,9 @@ import { supabase } from '../services/supabase.js'
 const mascotPath =
   `${import.meta.env.BASE_URL}mascot/cloud_smile_clean.png`
 
+const COUPON_EXPIRY_DATE = '2026-10-31'
+const COUPON_EXPIRY_LABEL = 'October 31, 2026'
+
 export function renderResultsPage() {
   const activity1Score = Number(
     sessionStorage.getItem('activity1Score') || 0
@@ -153,6 +156,9 @@ export function renderResultsPage() {
             <strong id="reward-code">
               ${reward.couponCode}
             </strong>
+            <span class="reward-expiry-date">
+              📅 Valid until ${COUPON_EXPIRY_LABEL}
+            </span>
           </div>
         </section>
 
@@ -437,6 +443,7 @@ const { error } = await supabase
       reward?.couponCode || createRewardCode(achievementLevel),
     coupon_earned: true,
     coupon_sent: false,
+    coupon_expiry_date: COUPON_EXPIRY_DATE,
     reward_name: rewardName,
     submission_token: getSubmissionToken(),
   }, {
@@ -548,6 +555,7 @@ const { error } = await supabase
       reward?.couponCode || createRewardCode(achievementLevel),
     coupon_earned: true,
     coupon_sent: false,
+    coupon_expiry_date: COUPON_EXPIRY_DATE,
     reward_name: rewardName,
     submission_token: getSubmissionToken(),
   }, {
