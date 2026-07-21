@@ -348,7 +348,7 @@ function renderGuestEmailForm() {
         id="claim-reward-button"
         type="submit"
       >
-        Save My Result and Reward
+        ✉️ Email My Coupon
       </button>
     </form>
   `
@@ -459,7 +459,7 @@ const { error } = await supabase
     if (submitButton) {
       submitButton.disabled = false
       submitButton.textContent =
-        'Save My Result and Reward'
+        '✉️ Email My Coupon'
     }
 
     showResultsError(
@@ -482,7 +482,7 @@ const { error } = await supabase
   )
 
   message.textContent =
-    'Your result and reward were saved successfully! 🎉'
+    'Your coupon email is ready. Press Send in your email app! ✉️'
 
   message.className =
     'results-message results-message-success'
@@ -498,14 +498,41 @@ const { error } = await supabase
         <div>
           <strong>Reward claimed!</strong>
           <p>
-            SORA can contact
-            ${escapeHtml(email)}
-            about this reward.
+            Your email app is opening. Press Send to email
+            the coupon to ${escapeHtml(email)}.
           </p>
         </div>
       </div>
     `
   }
+
+  openCouponEmail({
+    email,
+    couponCode:
+      reward?.couponCode || createRewardCode(achievementLevel),
+    rewardName,
+    totalScore,
+    completedQuests,
+  })
+}
+
+function openCouponEmail({
+  email,
+  couponCode,
+  rewardName,
+  totalScore,
+  completedQuests,
+}) {
+  const subject = encodeURIComponent(
+    '🎁 Your SORA Adventure Coupon'
+  )
+
+  const body = encodeURIComponent(
+    `Congratulations! 🎉\n\nYou completed ${completedQuests} SORA Adventure quest${completedQuests === 1 ? '' : 's'} and scored ${totalScore}/30.\n\nYour reward:\n${rewardName}\n\nYour coupon code:\n${couponCode}\n\n📅 Valid until ${COUPON_EXPIRY_LABEL}\n\nPlease show this coupon to SORA when claiming your free ASEP class.\n\nLearn more about SORA:\n${SORA_WEBSITE_URL}`
+  )
+
+  window.location.href =
+    `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`
 }
 
 async function saveCompletedResult({
