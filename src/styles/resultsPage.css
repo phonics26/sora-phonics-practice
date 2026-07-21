@@ -264,6 +264,7 @@
 }
 
 .reward-email-form button,
+.saved-coupon-email-button,
 .results-home-button,
 .share-game-button,
 .results-restart-button {
@@ -279,6 +280,7 @@
 }
 
 .reward-email-form button,
+.saved-coupon-email-button,
 .results-home-button {
   border: 0;
 

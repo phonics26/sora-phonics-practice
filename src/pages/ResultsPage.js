@@ -261,6 +261,20 @@ export function renderResultsPage() {
     )
   }
 
+  if (playerMode === 'email' && savedEmail) {
+    document
+      .querySelector('#saved-coupon-email-button')
+      ?.addEventListener('click', () => {
+        openCouponEmail({
+          email: savedEmail,
+          couponCode: reward.couponCode,
+          rewardName: reward.rewardName,
+          totalScore,
+          completedQuests: completedQuestCount,
+        })
+      })
+  }
+
   document
     .querySelector('#results-home-button')
     ?.addEventListener('click', () => {
@@ -367,8 +381,16 @@ function renderSavedEmailConfirmation(email) {
         <strong>${escapeHtml(email)}</strong>
 
         <small>
-          SORA can contact this address with the reward details.
+          Your coupon email will be addressed to this account.
         </small>
+
+        <button
+          id="saved-coupon-email-button"
+          class="saved-coupon-email-button"
+          type="button"
+        >
+          ✉️ Email My Coupon
+        </button>
       </div>
     </section>
   `
