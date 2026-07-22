@@ -10,7 +10,9 @@ const COUPON_EXPIRY_LABEL = 'October 31, 2026'
 const SORA_ADVENTURE_URL =
   'https://phonics26.github.io/sora-phonics-practice/'
 const SORA_WEBSITE_URL = 'https://sora.business/'
-const SORA_LINE_ACCOUNT_ID = '@wby2339i'
+const LINE_LOGIN_CHANNEL_ID = '2010793604'
+const LINE_CALLBACK_URL =
+  'https://iuazjlwhzcbbrihfypqn.supabase.co/functions/v1/line-webhook'
 
 export function renderResultsPage() {
   const activity1Score = Number(
@@ -280,8 +282,18 @@ export function renderResultsPage() {
 
   document
     .querySelector('#line-coupon-button')
-    ?.addEventListener('click', () => {
-      openLineCouponMessage(reward)
+    ?.addEventListener('click', async () => {
+      await startAutomaticLineCoupon({
+        email: savedEmail,
+        playerMode,
+        marketingConsent,
+        activity1Score,
+        activity2Score,
+        activity3Score,
+        totalScore,
+        completedQuests: completedQuestCount,
+        reward,
+      })
     })
 
   document
@@ -396,39 +408,95 @@ function renderLineClaimOption() {
       </button>
 
       <small>
-        メッセージを確認して、LINEで送信してください。
+        SORA公式LINEを友だち追加すると、結果とクーポンが自動で届きます。
       </small>
     </section>
   `
 }
 
-function openLineCouponMessage(reward) {
-  const message = [
-    '🎉 SORA Adventureをクリアしました！',
-    '',
-    '獲得したごほうび：',
-    reward.rewardName,
-    '',
-    'クーポン番号：',
-    reward.couponCode,
-    '',
-    '有効期限：',
-    '2026年10月31日',
-    '',
-    '無料クラスの開始可能日について、連絡を希望します。',
-    '',
-    '楽しく英語を学べることを楽しみにしています！',
-    'よろしくお願いします😊',
-  ].join('\n')
+async function startAutomaticLineCoupon({
+  email,
+  playerMode,
+  marketingConsent,
+  activity1Score,
+  activity2Score,
+  activity3Score,
+  totalScore,
+  completedQuests,
+  reward,
+}) {
+  const button =
+    document.querySelector('#line-coupon-button')
+  const message =
+    document.querySelector('#results-message')
+  const achievementLevel = Math.min(completedQuests, 3)
+  const submissionToken = getSubmissionToken()
 
-  const encodedAccountId = encodeURIComponent(
-    SORA_LINE_ACCOUNT_ID
+  if (button) {
+    button.disabled = true
+    button.textContent = 'LINEに接続しています…'
+  }
+
+  if (message) {
+    message.textContent = '結果を保存しています…'
+    message.className = 'results-message'
+  }
+
+  const { error } = await supabase
+    .from('sora_adventure_results')
+    .upsert({
+      email: email || null,
+      player_mode: playerMode,
+      marketing_consent: marketingConsent,
+      activity1_score: activity1Score,
+      activity2_score: activity2Score,
+      activity3_score: activity3Score,
+      total_score: totalScore,
+      completed_quests: completedQuests,
+      achievement_level: achievementLevel,
+      coupon_percentage: 0,
+      coupon_code:
+        reward?.couponCode || createRewardCode(achievementLevel),
+      coupon_earned: true,
+      coupon_sent: false,
+      coupon_expiry_date: COUPON_EXPIRY_DATE,
+      reward_name: getRewardNameFromCount(completedQuests),
+      submission_token: submissionToken,
+      line_delivery_status: 'pending_login',
+      line_delivery_error: null,
+    }, {
+      onConflict: 'submission_token',
+    })
+
+  if (error) {
+    console.error('LINE reward save error:', error)
+
+    if (button) {
+      button.disabled = false
+      button.textContent = 'LINEでクーポンを受け取る'
+    }
+
+    showResultsError(
+      message,
+      '結果を保存できませんでした。もう一度お試しください。'
+    )
+    return
+  }
+
+  const authorizationUrl = new URL(
+    'https://access.line.me/oauth2/v2.1/authorize'
   )
 
-  const encodedMessage = encodeURIComponent(message)
+  authorizationUrl.search = new URLSearchParams({
+    response_type: 'code',
+    client_id: LINE_LOGIN_CHANNEL_ID,
+    redirect_uri: LINE_CALLBACK_URL,
+    state: submissionToken,
+    scope: 'openid profile',
+    bot_prompt: 'aggressive',
+  }).toString()
 
-  window.location.href =
-    `https://line.me/R/oaMessage/${encodedAccountId}/?${encodedMessage}`
+  window.location.href = authorizationUrl.toString()
 }
 
 function renderSavedEmailConfirmation(email) {
