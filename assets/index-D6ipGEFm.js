@@ -688,7 +688,7 @@ ${_}`}class O extends Error{constructor({message:e,code:r,cause:s,name:n}){var i
       </div>
 
       <p>
-        LINEからクーポンを受け取ることもできます。
+        SORA公式LINEから結果とクーポンが自動で届きます。
       </p>
 
       <button
@@ -696,14 +696,14 @@ ${_}`}class O extends Error{constructor({message:e,code:r,cause:s,name:n}){var i
         class="line-coupon-button"
         type="button"
       >
-        LINEでクーポンを受け取る
+        SORAからLINEで自動受信
       </button>
 
       <small>
-        SORA公式LINEを友だち追加すると、結果とクーポンが自動で届きます。
+        友だち追加とLINE認証だけで完了します。メッセージ送信は不要です。
       </small>
     </section>
-  `}async function So({email:t,playerMode:e,marketingConsent:r,activity1Score:s,activity2Score:n,activity3Score:i,totalScore:a,completedQuests:o,reward:c}){const l=document.querySelector("#line-coupon-button"),u=document.querySelector("#results-message"),h=Math.min(o,3),d=rr();l&&(l.disabled=!0,l.textContent="LINEに接続しています…"),u&&(u.textContent="結果を保存しています…",u.className="results-message");const{error:f}=await er.from("sora_adventure_results").upsert({email:t||null,player_mode:e,marketing_consent:r,activity1_score:s,activity2_score:n,activity3_score:i,total_score:a,completed_quests:o,achievement_level:h,coupon_percentage:0,coupon_code:c?.couponCode||me(h),coupon_earned:!0,coupon_sent:!1,coupon_expiry_date:tr,reward_name:kt(o),submission_token:d,line_delivery_status:"pending_login",line_delivery_error:null},{onConflict:"submission_token"});if(f){console.error("LINE reward save error:",f),l&&(l.disabled=!1,l.textContent="LINEでクーポンを受け取る"),pt(u,"結果を保存できませんでした。もう一度お試しください。");return}const p=new URL("https://access.line.me/oauth2/v2.1/authorize");p.search=new URLSearchParams({response_type:"code",client_id:mo,redirect_uri:yo,state:d,scope:"openid profile",bot_prompt:"aggressive"}).toString(),window.location.href=p.toString()}function ko(t){return`
+  `}async function So({email:t,playerMode:e,marketingConsent:r,activity1Score:s,activity2Score:n,activity3Score:i,totalScore:a,completedQuests:o,reward:c}){const l=document.querySelector("#line-coupon-button"),u=document.querySelector("#results-message"),h=Math.min(o,3),d=rr();l&&(l.disabled=!0,l.textContent="LINEに接続しています…"),u&&(u.textContent="結果を保存しています…",u.className="results-message");const{error:f}=await er.from("sora_adventure_results").upsert({email:t||null,player_mode:e,marketing_consent:r,activity1_score:s,activity2_score:n,activity3_score:i,total_score:a,completed_quests:o,achievement_level:h,coupon_percentage:0,coupon_code:c?.couponCode||me(h),coupon_earned:!0,coupon_sent:!1,coupon_expiry_date:tr,reward_name:kt(o),submission_token:d,line_delivery_status:"pending_login",line_delivery_error:null},{onConflict:"submission_token"});if(f){console.error("LINE reward save error:",f),l&&(l.disabled=!1,l.textContent="SORAからLINEで自動受信"),pt(u,"結果を保存できませんでした。もう一度お試しください。");return}const p=new URL("https://access.line.me/oauth2/v2.1/authorize");p.search=new URLSearchParams({response_type:"code",client_id:mo,redirect_uri:yo,state:d,scope:"openid profile",bot_prompt:"aggressive"}).toString(),window.location.href=p.toString()}function ko(t){return`
     <section class="results-email-confirmation">
       <span>📧</span>
 
