@@ -15,6 +15,10 @@ const LINE_CALLBACK_URL =
   'https://iuazjlwhzcbbrihfypqn.supabase.co/functions/v1/line-webhook'
 
 export function renderResultsPage() {
+  const lineReturnStatus = new URLSearchParams(
+    window.location.search
+  ).get('line')
+
   const activity1Score = Number(
     sessionStorage.getItem('activity1Score') || 0
   )
@@ -314,6 +318,51 @@ export function renderResultsPage() {
     totalScore,
     completedQuestCount
   )
+
+  if (lineReturnStatus) {
+    revealReward()
+    showLineReturnMessage(lineReturnStatus)
+
+    window.history.replaceState(
+      {},
+      '',
+      `${window.location.pathname}${window.location.hash}`
+    )
+  }
+}
+
+function showLineReturnMessage(status) {
+  const message =
+    document.querySelector('#results-message')
+
+  if (!message) return
+
+  const messages = {
+    success:
+      '✅ SORA公式LINEから結果とクーポンを送信しました。LINEを確認してください！',
+    friend_required:
+      'SORA公式LINEを友だち追加してから、もう一度LINEボタンを押してください。',
+    send_failed:
+      'LINEへの送信に失敗しました。もう一度お試しください。',
+    result_not_found:
+      'ゲーム結果を確認できませんでした。もう一度LINEボタンを押してください。',
+    token_exchange_failed:
+      'LINE認証を完了できませんでした。もう一度お試しください。',
+    identity_failed:
+      'LINEアカウントを確認できませんでした。もう一度お試しください。',
+    cancelled:
+      'LINE認証がキャンセルされました。',
+  }
+
+  const isSuccess = status === 'success'
+
+  message.textContent =
+    messages[status] ||
+    'LINEとの接続を完了できませんでした。もう一度お試しください。'
+
+  message.className = isSuccess
+    ? 'results-message results-message-success'
+    : 'results-message results-message-error'
 }
 
 function revealReward() {

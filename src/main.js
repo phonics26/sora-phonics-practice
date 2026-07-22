@@ -25,4 +25,8 @@ registerPage('activity2', renderActivity2)
 registerPage('activity3', renderActivity3)
 registerPage('results', renderResultsPage)
 
-navigate('home')
+const lineReturnStatus = new URLSearchParams(
+  window.location.search
+).get('line')
+
+navigate(lineReturnStatus ? 'results' : 'home')
