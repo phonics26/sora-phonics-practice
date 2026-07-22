@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "jsr:@supabase/server@^1";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const LINE_TOKEN_URL = "https://api.line.me/oauth2/v2.1/token";
 const LINE_VERIFY_ID_TOKEN_URL =
@@ -7,12 +8,13 @@ const LINE_VERIFY_ID_TOKEN_URL =
 const LINE_FRIENDSHIP_URL =
   "https://api.line.me/friendship/v1/status";
 const LINE_PUSH_URL = "https://api.line.me/v2/bot/message/push";
+const supabaseAdmin = createAdminClient();
 
 export default {
-  fetch: withSupabase({ auth: "none" }, async (req, ctx) => {
+  fetch: withSupabase({ auth: "none" }, async (req) => {
     try {
       if (req.method === "GET") {
-        return await handleLineLoginCallback(req, ctx.supabaseAdmin);
+        return await handleLineLoginCallback(req, supabaseAdmin);
       }
 
       if (req.method === "POST") {
@@ -33,6 +35,28 @@ export default {
     }
   }),
 };
+
+function createAdminClient() {
+  const secretKeys = JSON.parse(
+    requiredSecret("SUPABASE_SECRET_KEYS"),
+  );
+  const secretKey = secretKeys.default;
+
+  if (!secretKey) {
+    throw new Error("The default Supabase secret key is missing.");
+  }
+
+  return createClient(
+    requiredSecret("SUPABASE_URL"),
+    secretKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    },
+  );
+}
 
 async function handleLineWebhook(req: Request) {
   const signature = req.headers.get("x-line-signature") || "";
