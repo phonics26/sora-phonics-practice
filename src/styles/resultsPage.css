@@ -265,6 +265,7 @@
 
 .reward-email-form button,
 .saved-coupon-email-button,
+.line-coupon-button,
 .results-home-button,
 .share-game-button,
 .results-restart-button {
@@ -300,6 +301,59 @@
 
   color: white;
   background: transparent;
+}
+
+.line-claim-option {
+  margin-top: 16px;
+  padding: 17px;
+
+  border-radius: 22px;
+
+  text-align: center;
+  color: #4d3b5d;
+  background: rgba(255, 255, 255, 0.91);
+}
+
+.line-claim-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: #817588;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.line-claim-divider::before,
+.line-claim-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ddd4e2;
+}
+
+.line-claim-option p {
+  margin: 13px 0 0;
+
+  font-weight: 800;
+}
+
+.line-coupon-button {
+  border: 0;
+
+  color: white;
+  background: #06c755;
+
+  box-shadow: 0 10px 20px rgba(6, 199, 85, 0.25);
+}
+
+.line-claim-option small {
+  display: block;
+
+  margin-top: 9px;
+
+  color: #756b7a;
+  line-height: 1.45;
 }
 
 .share-game-button {

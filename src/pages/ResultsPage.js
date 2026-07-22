@@ -10,6 +10,7 @@ const COUPON_EXPIRY_LABEL = 'October 31, 2026'
 const SORA_ADVENTURE_URL =
   'https://phonics26.github.io/sora-phonics-practice/'
 const SORA_WEBSITE_URL = 'https://sora.business/'
+const SORA_LINE_ACCOUNT_ID = '@wby2339i'
 
 export function renderResultsPage() {
   const activity1Score = Number(
@@ -174,6 +175,8 @@ export function renderResultsPage() {
               ? renderGuestEmailForm()
               : renderSavedEmailConfirmation(savedEmail)
           }
+
+          ${renderLineClaimOption()}
         </div>
 
         <p
@@ -276,6 +279,12 @@ export function renderResultsPage() {
   }
 
   document
+    .querySelector('#line-coupon-button')
+    ?.addEventListener('click', () => {
+      openLineCouponMessage(reward)
+    })
+
+  document
     .querySelector('#results-home-button')
     ?.addEventListener('click', () => {
       navigate('home')
@@ -325,13 +334,12 @@ function renderGuestEmailForm() {
 
         <div>
           <p>CLAIM YOUR REWARD</p>
-          <h2>Ask a parent or guardian</h2>
+          <h2>おうちの人にお願いしてね</h2>
         </div>
       </div>
 
       <p class="reward-email-description">
-        Enter your email to receive your coupon and more
-        information about the free ASEP class.
+        無料ASEPクラスのクーポンを受け取るために、おうちの人のメールアドレスを入力してください。
       </p>
 
       <label for="reward-parent-email">
@@ -353,8 +361,8 @@ function renderGuestEmailForm() {
         />
 
         <span>
-          Send me future SORA news and special offers.
-          <small>Optional</small>
+          SORAからのお知らせや特別なご案内を受け取る
+          <small>（任意）</small>
         </span>
       </label>
 
@@ -362,10 +370,65 @@ function renderGuestEmailForm() {
         id="claim-reward-button"
         type="submit"
       >
-        ✉️ Email My Coupon
+        ✉️ メールでクーポンを受け取る
       </button>
     </form>
   `
+}
+
+function renderLineClaimOption() {
+  return `
+    <section class="line-claim-option">
+      <div class="line-claim-divider">
+        <span>または</span>
+      </div>
+
+      <p>
+        LINEからクーポンを受け取ることもできます。
+      </p>
+
+      <button
+        id="line-coupon-button"
+        class="line-coupon-button"
+        type="button"
+      >
+        LINEでクーポンを受け取る
+      </button>
+
+      <small>
+        メッセージを確認して、LINEで送信してください。
+      </small>
+    </section>
+  `
+}
+
+function openLineCouponMessage(reward) {
+  const message = [
+    '🎉 SORA Adventureをクリアしました！',
+    '',
+    '獲得したごほうび：',
+    reward.rewardName,
+    '',
+    'クーポン番号：',
+    reward.couponCode,
+    '',
+    '有効期限：',
+    '2026年10月31日',
+    '',
+    '無料クラスの開始可能日について、連絡を希望します。',
+    '',
+    '楽しく英語を学べることを楽しみにしています！',
+    'よろしくお願いします😊',
+  ].join('\n')
+
+  const encodedAccountId = encodeURIComponent(
+    SORA_LINE_ACCOUNT_ID
+  )
+
+  const encodedMessage = encodeURIComponent(message)
+
+  window.location.href =
+    `https://line.me/R/oaMessage/${encodedAccountId}/?${encodedMessage}`
 }
 
 function renderSavedEmailConfirmation(email) {
@@ -663,15 +726,15 @@ function getCompletedQuestCount() {
 
 function getRewardNameFromCount(completedQuestCount) {
   if (completedQuestCount >= 3) {
-    return '🎉 1 month of ASEP English Class'
+    return '🎉 ASEP英語クラス1か月無料！'
   }
 
   if (completedQuestCount === 2) {
-    return '🎉 2 weeks of ASEP English Class'
+    return '🎉 ASEP英語クラス2週間無料！'
   }
 
   if (completedQuestCount === 1) {
-    return '🎉 1 week of ASEP English Class'
+    return '🎉 ASEP英語クラス1週間無料！'
   }
 
   return 'No reward yet'

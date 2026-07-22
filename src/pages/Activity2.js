@@ -382,7 +382,7 @@ function finishActivity() {
           class="animal-primary-button"
           type="button"
         >
-          🔓 Unlock Word Builder
+          🔓 次のクエストをアンロック
         </button>
 
         <button

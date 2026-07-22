@@ -614,7 +614,7 @@ function finishActivity() {
           id="soccer-return-home"
           type="button"
         >
-          🔓 Unlock Animal Match
+          🔓 次のクエストをアンロック
         </button>
 
         <button

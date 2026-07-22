@@ -3,7 +3,7 @@
 
   if (count >= 3) {
     return {
-      label: '🎉 1 month of ASEP English Class',
+      label: '🎉 ASEP英語クラス1か月無料！',
       tier: 3,
       completedQuests: count,
     }
@@ -11,7 +11,7 @@
 
   if (count === 2) {
     return {
-      label: '🎉 2 weeks of ASEP English Class',
+      label: '🎉 ASEP英語クラス2週間無料！',
       tier: 2,
       completedQuests: count,
     }
@@ -19,7 +19,7 @@
 
   if (count === 1) {
     return {
-      label: '🎉 1 week of ASEP English Class',
+      label: '🎉 ASEP英語クラス1週間無料！',
       tier: 1,
       completedQuests: count,
     }

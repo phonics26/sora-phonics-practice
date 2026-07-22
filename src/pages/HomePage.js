@@ -79,7 +79,7 @@ export function renderHomePage() {
             <div>
               <p>YOUR ADVENTURE</p>
               <strong>
-                ${completedActivities} of 3 quests complete
+                ${completedActivities}/3 クエスト完了
               </strong>
             </div>
 
@@ -140,7 +140,7 @@ export function renderHomePage() {
               <p>LEVEL 1</p>
               <strong>Explorer</strong>
               <span>1 quest completed</span>
-              <small>1 week of ASEP free</small>
+              <small>ASEP英語クラス1週間無料！</small>
             </article>
 
             <article class="${
@@ -152,7 +152,7 @@ export function renderHomePage() {
               <p>LEVEL 2</p>
               <strong>Champion</strong>
               <span>2 quests completed</span>
-              <small>2 weeks of ASEP free</small>
+              <small>ASEP英語クラス2週間無料！</small>
             </article>
 
             <article class="${
@@ -223,7 +223,7 @@ function renderActivityOne({ complete, score }) {
         <h2>Letter Goal Quest</h2>
 
         <span>
-          Drag the soccer ball into the correct letter goal.
+          サッカーボールを正しい文字のゴールに入れよう！
         </span>
 
         ${
@@ -271,8 +271,8 @@ function renderActivityTwo({ complete, score, unlocked }) {
 
         <span>
           ${unlocked
-            ? '🔓 Unlocked — ready to begin!'
-            : '🔒 Complete Quest 1 to unlock this quest'}
+            ? '🔓 アンロック完了！今すぐスタート！'
+            : '🔒 クエスト1をクリアすると遊べるようになります'}
         </span>
 
         ${
@@ -325,8 +325,8 @@ function renderActivityThree({ complete, score, unlocked }) {
 
         <span>
           ${unlocked
-            ? '🔓 Unlocked — ready to begin!'
-            : '🔒 Complete Quest 2 to unlock this quest'}
+            ? '🔓 アンロック完了！今すぐスタート！'
+            : '🔒 クエスト2をクリアすると遊べるようになります'}
         </span>
 
         ${
@@ -422,18 +422,18 @@ function isComplete(key) {
 
 function getRewardPreview(completedActivities) {
   if (completedActivities >= 3) {
-    return '🌟 Level 3 unlocked: First month of ASEP free!'
+    return '🌟 レベル3達成！ASEP英語クラス1か月無料！'
   }
 
   if (completedActivities >= 2) {
-    return '🏆 Level 2 unlocked: Two weeks of ASEP free!'
+    return '🏆 レベル2達成！ASEP英語クラス2週間無料！'
   }
 
   if (completedActivities >= 1) {
-    return '🌱 Level 1 unlocked: One week of ASEP free!'
+    return '🌱 レベル1達成！ASEP英語クラス1週間無料！'
   }
 
-  return 'Complete any quest to unlock your first reward!'
+  return 'クエストを1つクリアすると、最初のごほうびがもらえるよ！'
 }
 
 function escapeHtml(value) {
