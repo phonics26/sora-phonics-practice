@@ -396,7 +396,7 @@ function renderLineClaimOption() {
       </div>
 
       <p>
-        LINEからクーポンを受け取ることもできます。
+        SORA公式LINEから結果とクーポンが自動で届きます。
       </p>
 
       <button
@@ -404,11 +404,11 @@ function renderLineClaimOption() {
         class="line-coupon-button"
         type="button"
       >
-        LINEでクーポンを受け取る
+        SORAからLINEで自動受信
       </button>
 
       <small>
-        SORA公式LINEを友だち追加すると、結果とクーポンが自動で届きます。
+        友だち追加とLINE認証だけで完了します。メッセージ送信は不要です。
       </small>
     </section>
   `
@@ -473,7 +473,7 @@ async function startAutomaticLineCoupon({
 
     if (button) {
       button.disabled = false
-      button.textContent = 'LINEでクーポンを受け取る'
+      button.textContent = 'SORAからLINEで自動受信'
     }
 
     showResultsError(
