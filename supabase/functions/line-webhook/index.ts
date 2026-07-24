@@ -138,6 +138,41 @@ async function handleLineLoginCallback(req: Request, supabaseAdmin: any) {
     return redirectToApp("identity_failed");
   }
 
+  const { data: adultResult, error: adultLookupError } = await supabaseAdmin
+    .from("adult_listening_results")
+    .select(
+      "submission_token, line_user_id, score, gse_range, result_title, ability, improvement, strategy, practice, outcome",
+    )
+    .eq("submission_token", state)
+    .maybeSingle();
+
+  if (adultLookupError) {
+    console.error("Adult result lookup failed", adultLookupError);
+  }
+
+  let resultType = "adult";
+  let tableName = "adult_listening_results";
+  let result = adultResult;
+
+  if (!result) {
+    const { data: adventureResult, error: adventureError } = await supabaseAdmin
+      .from("sora_adventure_results")
+      .select(
+        "submission_token, line_user_id, activity1_score, activity2_score, activity3_score, total_score, reward_name, coupon_code, coupon_expiry_date",
+      )
+      .eq("submission_token", state)
+      .maybeSingle();
+
+    if (adventureError || !adventureResult) {
+      console.error("Result lookup failed", adventureError);
+      return redirectToApp("result_not_found", "adventure");
+    }
+
+    resultType = "adventure";
+    tableName = "sora_adventure_results";
+    result = adventureResult;
+  }
+
   const friendshipResponse = await fetch(LINE_FRIENDSHIP_URL, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -151,34 +186,21 @@ async function handleLineLoginCallback(req: Request, supabaseAdmin: any) {
   if (!friendship.friendFlag) {
     await updateDeliveryStatus(
       supabaseAdmin,
+      tableName,
       state,
       lineUserId,
       "friend_required",
       "The SORA Official Account was not added as a friend.",
     );
-
-    return redirectToApp("friend_required");
-  }
-
-  const { data: result, error: resultError } = await supabaseAdmin
-    .from("sora_adventure_results")
-    .select(
-      "submission_token, line_user_id, activity1_score, activity2_score, activity3_score, total_score, reward_name, coupon_code, coupon_expiry_date",
-    )
-    .eq("submission_token", state)
-    .single();
-
-  if (resultError || !result) {
-    console.error("Game result lookup failed", resultError);
-    return redirectToApp("result_not_found");
+    return redirectToApp("friend_required", resultType);
   }
 
   if (result.line_user_id && result.line_user_id !== lineUserId) {
-    return redirectToApp("already_claimed");
+    return redirectToApp("already_claimed", resultType);
   }
 
   const { error: linkError } = await supabaseAdmin
-    .from("sora_adventure_results")
+    .from(tableName)
     .update({
       line_user_id: lineUserId,
       line_connected_at: new Date().toISOString(),
@@ -189,10 +211,12 @@ async function handleLineLoginCallback(req: Request, supabaseAdmin: any) {
 
   if (linkError) {
     console.error("LINE user link failed", linkError);
-    return redirectToApp("link_failed");
+    return redirectToApp("link_failed", resultType);
   }
 
-  const message = buildCouponMessage(result);
+  const message = resultType === "adult"
+    ? buildAdultResultMessage(result)
+    : buildCouponMessage(result);
   const sendResponse = await fetch(LINE_PUSH_URL, {
     method: "POST",
     headers: {
@@ -208,30 +232,37 @@ async function handleLineLoginCallback(req: Request, supabaseAdmin: any) {
 
   if (!sendResponse.ok) {
     const sendError = await sendResponse.text();
-    console.error("LINE coupon delivery failed", sendError);
-
+    console.error("LINE result delivery failed", sendError);
     await updateDeliveryStatus(
       supabaseAdmin,
+      tableName,
       state,
       lineUserId,
       "failed",
       sendError.slice(0, 1000),
     );
-
-    return redirectToApp("send_failed");
+    return redirectToApp("send_failed", resultType);
   }
 
-  await supabaseAdmin
-    .from("sora_adventure_results")
-    .update({
+  const sentFields = resultType === "adult"
+    ? {
+      line_delivery_status: "sent",
+      line_result_sent_at: new Date().toISOString(),
+      line_delivery_error: null,
+    }
+    : {
       line_delivery_status: "sent",
       line_coupon_sent_at: new Date().toISOString(),
       line_delivery_error: null,
       coupon_sent: true,
-    })
+    };
+
+  await supabaseAdmin
+    .from(tableName)
+    .update(sentFields)
     .eq("submission_token", state);
 
-  return redirectToApp("success");
+  return redirectToApp("success", resultType);
 }
 
 async function verifyAndGetLineUserId(
@@ -262,13 +293,14 @@ async function verifyAndGetLineUserId(
 
 async function updateDeliveryStatus(
   supabaseAdmin: any,
+  tableName: string,
   submissionToken: string,
   lineUserId: string,
   status: string,
   errorMessage: string,
 ) {
   await supabaseAdmin
-    .from("sora_adventure_results")
+    .from(tableName)
     .update({
       line_user_id: lineUserId,
       line_connected_at: new Date().toISOString(),
@@ -276,6 +308,37 @@ async function updateDeliveryStatus(
       line_delivery_error: errorMessage,
     })
     .eq("submission_token", submissionToken);
+}
+
+function buildAdultResultMessage(result: Record<string, unknown>) {
+  return [
+    "🎧 SORA English Listening Assessment",
+    "",
+    "Your personal listening result is ready!",
+    "",
+    `Score: ${Number(result.score || 0)}/10`,
+    `Estimated Listening GSE range: ${String(result.gse_range || "")}`,
+    `Result: ${String(result.result_title || "")}`,
+    "",
+    "Your current ability:",
+    String(result.ability || ""),
+    "",
+    "Area to improve:",
+    String(result.improvement || ""),
+    "",
+    "Improvement strategy:",
+    String(result.strategy || ""),
+    "",
+    "Recommended practice:",
+    String(result.practice || ""),
+    "",
+    "Your improvement outcome:",
+    String(result.outcome || ""),
+    "",
+    "This is a listening-only GSE estimate, not a complete proficiency certification.",
+    "",
+    "Contact SORA for personal feedback and the opportunity for a free trial lesson in Iwakuni or Hiroshima."
+  ].join("\n");
 }
 
 function buildCouponMessage(result: Record<string, unknown>) {
@@ -320,8 +383,12 @@ function getCallbackUrl() {
   return `${requiredSecret("SUPABASE_URL")}/functions/v1/line-webhook`;
 }
 
-function redirectToApp(status: string) {
-  const appUrl = new URL(requiredSecret("APP_URL"));
+function redirectToApp(status: string, resultType = "adventure") {
+  const appUrl = new URL(
+    resultType === "adult"
+      ? "https://phonics26.github.io/sora-app-adult/"
+      : requiredSecret("APP_URL"),
+  );
   appUrl.searchParams.set("line", status);
 
   return Response.redirect(appUrl.toString(), 302);
